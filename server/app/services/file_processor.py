@@ -1,5 +1,6 @@
 from fastapi import UploadFile, File
 from .pdf_service import extract_text_from_pdf
+from .image_service import extract_text_from_image
 
 
 async def process_file(file: UploadFile):
@@ -13,6 +14,16 @@ async def process_file(file: UploadFile):
         return {
             "filename": file.filename,
             "type": "pdf",
+            "content": text,
+        }
+
+    if file.content_type.startswith("image/"):
+
+        text = extract_text_from_image(content)
+
+        return {
+            "filename": file.filename,
+            "type": "image",
             "content": text,
         }
 
