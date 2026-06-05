@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Form
 from fastapi import UploadFile, File
+from agent.intent_detector import detect_intent
 from tools.summarizer import summarize_content
 from services.file_processor import process_file
 from typing import List, Optional
@@ -18,14 +19,14 @@ async def chat(
         info = await process_file(file)
         process_file_info.append(info)
 
-    combine_context = "\n\n".join(
-        f"""src :{file['filename']} \n type:{file['type']} \n content:{file["content"]}"""
-        for file in process_file_info
-    )
+    # combine_context = "\n\n".join(
+    #     f"""src :{file['filename']} \n type:{file['type']} \n content:{file["content"]}"""
+    #     for file in process_file_info
+    # )
 
-    summarized_context = await summarize_content(combine_context)
+    intent = await detect_intent(query)
 
     return {
         "query": query,
-        "summary": summarized_context,
+        "intent": intent
     }
