@@ -1,19 +1,12 @@
 from fastapi import APIRouter, Form
 from fastapi import UploadFile, File
+from tools.summarizer import summarize_content
 from services.file_processor import process_file
 from typing import List, Optional
 
 
 router = APIRouter()
 
-
-# @router.post("/")
-# async def chat(file: UploadFile = File(...)):
-
-#     pdf_bytes = await file.read()
-#     text = extract_text_from_pdf(pdf_bytes)
-
-#     return {"filename": file.filename, "content": text}
 
 
 @router.post("/")
@@ -30,7 +23,9 @@ async def chat(
         for file in process_file_info
     )
 
+    summarized_context = await summarize_content(combine_context)
+
     return {
         "query": query,
-        "combine_context": combine_context,
+        "summary": summarized_context,
     }
