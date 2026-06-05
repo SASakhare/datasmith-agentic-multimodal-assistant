@@ -44,4 +44,5 @@ async def process_file(file: UploadFile):
     return {
         "filename": file.filename,
         "type": "unknown",
+        "content": "",
     }
