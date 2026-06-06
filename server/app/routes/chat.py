@@ -9,6 +9,8 @@ from rag.chunker import chunk_text
 from rag.key_word_extraction import extract_keywords
 from rag.retriever import retrieve_relevant_chunks
 from rag.vector_store import add_documents_to_vector_store
+from repositories.message_repository import get_conversation_history
+from services.chat_history_service import store_chat
 from tools.retriver_prompt_generator import get_relevant_queries
 from tools.summarizer import summarize_content
 from services.file_processor import process_file
@@ -16,17 +18,21 @@ from typing import List, Optional
 from agent.graph import app_graph
 from dependencies.auth_dependency import get_current_user
 from fastapi import Depends
+
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/{conversation_id}")
 async def chat(
+    conversation_id: str,
     query: str = Form(...),
     files: Optional[List[UploadFile]] = File(default=None),
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
 
     try:
+
+        history = await get_conversation_history(conversation_id)
 
         process_file_info = []
         for file in files or []:
@@ -58,7 +64,7 @@ async def chat(
             query=query,
             conversation_id=str(uuid4()),
             current_step=0,
-            conversation_history=[],
+            conversation_history=history,
             plan=None,
             retrieved_context="",
             final_answer="",
@@ -67,13 +73,20 @@ async def chat(
             available_knowledge=available_knowledge,
         )
 
-        response = await app_graph.ainvoke(state.model_dump()) # type: ignore
+        response = await app_graph.ainvoke(state.model_dump())  # type: ignore
 
-        await retriever_node(state=state)
+        await store_chat(
+            conversation_id=conversation_id,
+            user_message=query,
+            assistant_message=response["final_answer"],
+        )
+
+        
+
         return {
             "query": query,
             "response": response,
-            "agent_state": state,
+            "conversation_id": conversation_id,
         }
 
     except Exception as e:

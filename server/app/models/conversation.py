@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 class RagFile(BaseModel):
-    file_id: str
     filename: str
     file_type: str
     file_content: str

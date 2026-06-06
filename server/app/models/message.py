@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Message(BaseModel):
 
-    id:str | None = None
+    message_id:str 
     
     conversation_id: str
 
