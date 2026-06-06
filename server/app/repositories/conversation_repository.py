@@ -1,11 +1,11 @@
-from database.collections import conversations_collection
+from database.collections import conversations_collection,messages_collection
 
 
 async def create_conversation(data: dict):
 
     result = await conversations_collection.insert_one(data)
 
-    return str(result.inserted_id)
+    return result
 
 
 async def get_conversations(user_id: str):
@@ -25,3 +25,18 @@ async def update_conversation(conversation_id: str, data: dict):
     return await conversations_collection.update_one(
         {"conversation_id": conversation_id}, {"$set": data}
     )
+
+
+async def delete_conversation(conversation_id: str):
+
+    # delete all messages
+    await messages_collection.delete_many(
+        {"conversation_id": conversation_id}
+    )
+
+    # delete conversation
+    result = await conversations_collection.delete_one(
+        {"conversation_id": conversation_id}
+    )
+
+    return result
