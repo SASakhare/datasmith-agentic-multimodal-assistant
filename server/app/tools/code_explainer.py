@@ -2,7 +2,7 @@ from services.llm_service import llm
 from prompts.code_explanation_prompt import code_explanation_prompt
 
 
-def explain_code(code: str) -> str:
+async def explain_code(code: str) -> str:
     """
     Explains the given code using a language model.
 

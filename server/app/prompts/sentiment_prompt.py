@@ -1,4 +1,4 @@
-from langchain.prompts import ChatPromptTemplate # type: ignore
+from langchain_core.prompts import ChatPromptTemplate # type: ignore
 
 
 

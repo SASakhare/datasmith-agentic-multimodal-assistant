@@ -10,7 +10,6 @@ intent_detector_prompt = ChatPromptTemplate.from_template(
     - question_answering
     - sentiment_analysis
     - code_explanation
-    - compare_documents
     - general_qa
 
     Intent definitions:
@@ -18,7 +17,6 @@ intent_detector_prompt = ChatPromptTemplate.from_template(
     - question_answering: user asks a specific question about facts or details in a document or text.
     - sentiment_analysis: user asks for the emotional tone or sentiment of text.
     - code_explanation: user asks to explain, annotate, or clarify code.
-    - compare_documents: user asks to compare, contrast, or identify differences between documents.
     - general_qa: user asks general knowledge or domain questions not tied to a specific document.
 
     If multiple intents apply, pick the most specific. If uncertain, choose "other".
