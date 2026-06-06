@@ -25,5 +25,9 @@ code_explanation_prompt = ChatPromptTemplate.from_template(
 
     Code:
     {code}
+
+    User Query:
+    {query}
+
     """
 )

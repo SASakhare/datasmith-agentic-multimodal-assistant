@@ -2,7 +2,7 @@ from services.llm_service import llm
 from prompts.sentiment_prompt import sentiment_prompt
 
 
-async def analyze_sentiment(content: str) -> str:
+async def analyze_sentiment(content: str,query: str) -> str:
     """
     Analyzes the sentiment of the given content using a language model.
 
@@ -12,7 +12,7 @@ async def analyze_sentiment(content: str) -> str:
         str: The sentiment analysis result.
     """
     # Generate the prompt with the provided content
-    prompt = sentiment_prompt.format(content=content)
+    prompt = sentiment_prompt.format(content=content,query=query)
 
     # Use the language model to generate a sentiment analysis based on the prompt
     sentiment = llm.invoke([prompt])

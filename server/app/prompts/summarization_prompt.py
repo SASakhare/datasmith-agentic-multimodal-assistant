@@ -14,6 +14,10 @@ summarization_prompt = ChatPromptTemplate.from_template(
 
     Content:
     {content}
+
+    User Query:
+    {query}
+
     """
 )
 

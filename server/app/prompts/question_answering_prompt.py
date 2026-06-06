@@ -15,6 +15,6 @@ question_answer_prompt = ChatPromptTemplate.from_template(
     {question}
 
     Context:
-    {context}
+    {content}
     """
 )
