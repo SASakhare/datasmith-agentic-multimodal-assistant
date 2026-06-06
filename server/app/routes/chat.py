@@ -4,6 +4,7 @@ from fastapi import UploadFile, File
 from agent.intent_detector import detect_intent
 from agent.planner import create_plan
 from agent.state import AgentState
+from nodes.retriever_node import retriever_node
 from rag.chunker import chunk_text
 from rag.key_word_extraction import extract_keywords
 from rag.retriever import retrieve_relevant_chunks
@@ -13,7 +14,8 @@ from tools.summarizer import summarize_content
 from services.file_processor import process_file
 from typing import List, Optional
 from agent.graph import app_graph
-
+from dependencies.auth_dependency import get_current_user
+from fastapi import Depends
 router = APIRouter()
 
 
@@ -21,6 +23,7 @@ router = APIRouter()
 async def chat(
     query: str = Form(...),
     files: Optional[List[UploadFile]] = File(default=None),
+    current_user=Depends(get_current_user)
 ):
 
     try:
@@ -47,9 +50,9 @@ async def chat(
                 text = f"filename:{f['filename']} , type : {f['type']} , keyword :[{keyword_sentence}] , preview(first 300 words) : {preview} , word_count : {word_count} "
                 available_knowledge.append(text)
 
-            # chunk_docs = await chunk_text(combine_context)
+            chunk_docs = await chunk_text(combine_context)
 
-            # await add_documents_to_vector_store(chunk_docs)
+            await add_documents_to_vector_store(chunk_docs)
 
         state = AgentState(
             query=query,
@@ -64,8 +67,9 @@ async def chat(
             available_knowledge=available_knowledge,
         )
 
-        response = await app_graph.ainvoke(state.model_dump())
+        response = await app_graph.ainvoke(state.model_dump()) # type: ignore
 
+        await retriever_node(state=state)
         return {
             "query": query,
             "response": response,

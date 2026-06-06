@@ -1,4 +1,6 @@
 from fastapi import HTTPException
+
+from tools.retriver_prompt_generator import Query
 from .vector_store import qdrant
 from .embeddings import create_embedding
 
@@ -24,7 +26,7 @@ async def retrieve_relevant_chunks(query: str):
         )
 
 
-async def retrieve_relevant_chunks_with_queries(queries: list[str]):
+async def retrieve_relevant_chunks_with_queries(queries: list[Query]):
 
     try:
         relevant_chunks = []
@@ -32,13 +34,15 @@ async def retrieve_relevant_chunks_with_queries(queries: list[str]):
 
         for query in queries:
 
-            chunks = retriever.invoke(query["query"])  # type: ignore
-
-            relevant_chunks.append(chunks)
+            chunks = retriever.invoke(query.query)
+            # print(query.query)
+            relevant_chunks.extend(chunks)
 
         return relevant_chunks
 
     except Exception as e:
+
+        print(e)
 
         raise HTTPException(
             status_code=500,

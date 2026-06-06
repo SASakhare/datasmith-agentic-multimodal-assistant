@@ -34,9 +34,10 @@ async def get_relevant_queries(query: str):
 
         response = llm_with_QueryList.invoke([prompt])
 
-        return response
+        return response.queries
     
     except Exception as e:
+        print(e)
 
         raise HTTPException(
             status_code=500,
