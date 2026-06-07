@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from agent.state import Message
 from prompts.planner_prompt import PLANNER_PROMPT
 from services.llm_service import llm  # type: ignore
 from fastapi import HTTPException
@@ -22,7 +23,7 @@ class ExecutionPlan(BaseModel):
 llm_with_ExecutionPlan = llm.with_structured_output(ExecutionPlan)
 
 
-async def create_plan(query: str, available_knowledge: list[str]):
+async def create_plan(query: str, available_knowledge: list[str],history:list[Message]):
     try:
 
         available_knowledges = "\n".join(available_knowledge)

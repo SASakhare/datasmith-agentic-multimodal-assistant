@@ -9,6 +9,7 @@ from rag.chunker import chunk_text
 from rag.key_word_extraction import extract_keywords
 from rag.retriever import retrieve_relevant_chunks
 from rag.vector_store import add_documents_to_vector_store
+from repositories.conversation_repository import build_agent_memory
 from repositories.message_repository import get_conversation_history
 from services.chat_history_service import store_chat
 from tools.retriver_prompt_generator import get_relevant_queries
@@ -32,7 +33,7 @@ async def chat(
 
     try:
 
-        history = await get_conversation_history(conversation_id)
+        agent_memory = await build_agent_memory(conversation_id)
 
         process_file_info = []
         for file in files or []:
@@ -64,13 +65,14 @@ async def chat(
             query=query,
             conversation_id=str(uuid4()),
             current_step=0,
-            conversation_history=history,
+            conversation_history=agent_memory["messages"],
             plan=None,
             retrieved_context="",
             final_answer="",
             need_human_approval=False,
             human_approved=False,
             available_knowledge=available_knowledge,
+            conversation_summary=agent_memory["summary"],
         )
 
         response = await app_graph.ainvoke(state.model_dump())  # type: ignore
@@ -80,8 +82,6 @@ async def chat(
             user_message=query,
             assistant_message=response["final_answer"],
         )
-
-        
 
         return {
             "query": query,

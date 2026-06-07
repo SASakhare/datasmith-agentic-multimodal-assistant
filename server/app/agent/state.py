@@ -19,6 +19,8 @@ class AgentState(BaseModel):
 
     conversation_history: List[Message]
 
+    conversation_summary: str
+
     plan: ExecutionPlan | None
 
     retrieved_context: str

@@ -12,6 +12,8 @@ class Conversation(BaseModel):
 
     conversation_id: str
 
+    summary: str
+
     user_id: str
 
     title: str

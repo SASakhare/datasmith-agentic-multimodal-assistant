@@ -52,3 +52,46 @@ async def increment_message_count(
             "$set": {"updated_at": datetime.utcnow()},
         },
     )
+
+
+
+async def get_recent_messages(
+    conversation_id: str,
+    limit: int = 6
+):
+
+    cursor = (
+        messages_collection
+        .find(
+            {"conversation_id": conversation_id}
+        )
+        .sort("created_at", -1)
+        .limit(limit)
+    )
+
+    messages = await cursor.to_list(
+        length=limit
+    )
+
+    messages.reverse()
+
+    return messages
+
+
+async def build_agent_memory(
+    conversation_id: str,
+):
+
+    conversation = await get_conversation(
+        conversation_id
+    )
+
+    recent_messages = await get_recent_messages(
+        conversation_id,
+        limit=6
+    )
+
+    return {
+        "summary": conversation["summary"], # type: ignore
+        "messages": recent_messages,
+    }
