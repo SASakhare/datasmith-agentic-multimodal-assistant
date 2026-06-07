@@ -18,12 +18,15 @@ async def code_explainer_node(
 
         summary = state.conversation_summary
 
+        web_context=state.web_context
+
         sentiment = await explain_code(
             code=state.retrieved_context,
             query=query,
             available_knowledge=available_knowledge,
             history=history,
             summary=summary,
+            web_context=web_context
         )
 
         return {

@@ -14,6 +14,7 @@ async def explain_code(
     available_knowledge: list[str],
     history: list[Message],
     summary: str,
+    web_context:str,
 ) -> str:
 
     try:
@@ -35,6 +36,7 @@ async def explain_code(
             available_knowledge=available_knowledge_text,
             summary=summary,
             history=history_text,
+            web_context=web_context,
         )
 
         response = llm.invoke(

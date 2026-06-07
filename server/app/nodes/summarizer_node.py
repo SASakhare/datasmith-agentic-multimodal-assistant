@@ -13,12 +13,20 @@ async def summarizer_node(
 
         available_knowledge = state.available_knowledge
 
-        history=state.conversation_history
+        history = state.conversation_history
 
-        summary=state.conversation_summary
+        summary = state.conversation_summary
 
+        web_context = state.web_context
 
-        summary = await summarize_content(content=state.retrieved_context, query=query,available_knowledge=available_knowledge,history=history,summary=summary)
+        summary = await summarize_content(
+            content=state.retrieved_context,
+            query=query,
+            available_knowledge=available_knowledge,
+            history=history,
+            summary=summary,
+            web_context=web_context,
+        )
 
         return {
             "final_answer": summary,

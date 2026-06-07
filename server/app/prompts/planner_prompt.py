@@ -25,6 +25,9 @@ PLANNER_PROMPT = """
     general_qa
     - Answers general knowledge questions.
 
+    web_search
+    - To websearch to find latest and relevant information required to give the answer to the user
+
     --------------------------------------------------
     AVAILABLE KNOWLEDGE
     --------------------------------------------------
@@ -79,6 +82,9 @@ PLANNER_PROMPT = """
     general_qa
     - User asks a general knowledge question
     that does not require retrieval.
+
+    web_search
+    - User ask about latest news and latest things
 
     --------------------------------------------------
     RAG RULES

@@ -4,7 +4,7 @@ from services.llm_service import llm
 from prompts.question_answering_prompt import question_answer_prompt  # type: ignore
 
 
-async def answer_question(content: str, question: str, available_knowledge: list[str], history: list[Message], summary: str) -> str:
+async def answer_question(content: str, question: str, available_knowledge: list[str], history: list[Message], summary: str,web_context:str) -> str:
     """
     Answers a question about the given content using a language model.
 
@@ -34,6 +34,7 @@ async def answer_question(content: str, question: str, available_knowledge: list
                     available_knowledge=available_knowledge_text,
                     summary=summary,
                     history=history_text,
+                    web_context=web_context
                 )
 
         response = llm.invoke(

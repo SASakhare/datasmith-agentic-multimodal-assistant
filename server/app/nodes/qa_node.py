@@ -19,7 +19,9 @@ async def qa_node(
 
         context = state.retrieved_context
 
-        response = await answer_question(content=context, question=query,available_knowledge=available_knowledge,history=history,summary=summary)
+        web_context=state.web_context
+
+        response = await answer_question(content=context, question=query,available_knowledge=available_knowledge,history=history,summary=summary,web_context=web_context)
 
         return {
             "final_answer": response,

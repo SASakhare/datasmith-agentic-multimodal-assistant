@@ -15,6 +15,10 @@ class AgentState(BaseModel):
 
     conversation_id: str
 
+    need_web_search: bool
+
+    web_context:str
+
     current_step: int
 
     conversation_history: List[Message]

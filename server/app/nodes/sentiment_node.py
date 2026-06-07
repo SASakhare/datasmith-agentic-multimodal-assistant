@@ -16,12 +16,15 @@ async def sentiment_node(
 
         summary = state.conversation_summary
 
+        web_context=state.web_context
+
         sentiment = await analyze_sentiment(
             content=state.retrieved_context,
             query=query,
             available_knowledge=available_knowledge,
             history=history,
             summary=summary,
+            web_context=web_context
         )
 
         return {

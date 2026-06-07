@@ -15,6 +15,10 @@ SUMMARIZATION_PROMPT = """
     Recent Conversation History:
     {history}
 
+    Web Search Result :
+    {web_context}
+    
+
     User Request:
     {query}
 

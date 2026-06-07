@@ -19,6 +19,9 @@ QUESTION_ANSWER_PROMPT = """
     4. Recent Conversation History
     {history}
 
+    5. Web Search Result :
+    {web_context}
+    
     Current User Question:
     {question}
 

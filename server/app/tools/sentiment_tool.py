@@ -13,6 +13,7 @@ async def analyze_sentiment(
     available_knowledge: list[str],
     history: list[Message],
     summary: str,
+    web_context:str
 ) -> str:
 
     try:

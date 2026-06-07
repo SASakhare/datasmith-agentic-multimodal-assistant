@@ -73,6 +73,8 @@ async def chat(
             human_approved=False,
             available_knowledge=available_knowledge,
             conversation_summary=agent_memory["summary"],
+            web_context="",
+            need_web_search=False,
         )
 
         response = await app_graph.ainvoke(state.model_dump())  # type: ignore

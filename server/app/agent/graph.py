@@ -3,6 +3,7 @@ from langgraph.graph import StateGraph, END  # type: ignore
 from agent.state import AgentState
 from agent.tool_router import tool_router
 
+from nodes.web_search_node import web_search_node
 from nodes.planner_node import planner_node
 from nodes.retriever_node import retriever_node
 from nodes.qa_node import qa_node
@@ -27,6 +28,8 @@ graph.add_node("sentiment", sentiment_node)
 
 graph.add_node("code_explainer", code_explainer_node)
 
+graph.add_node("web_search", web_search_node)
+
 graph.add_node("final_answer", final_answer_node)
 
 
@@ -39,6 +42,7 @@ graph.add_conditional_edges(
     tool_router,
     {
         "retriever": "retriever",
+        "web_search": "web_search",
         "general_qa": "general_qa",
         "summarizer": "summarizer",
         "sentiment": "sentiment",
@@ -52,6 +56,7 @@ graph.add_conditional_edges(
     tool_router,
     {
         "retriever": "retriever",
+        "web_search": "web_search",
         "general_qa": "general_qa",
         "summarizer": "summarizer",
         "sentiment": "sentiment",
@@ -65,6 +70,7 @@ graph.add_conditional_edges(
     tool_router,
     {
         "retriever": "retriever",
+        "web_search": "web_search",
         "general_qa": "general_qa",
         "summarizer": "summarizer",
         "sentiment": "sentiment",
@@ -78,6 +84,7 @@ graph.add_conditional_edges(
     tool_router,
     {
         "retriever": "retriever",
+        "web_search": "web_search",
         "general_qa": "general_qa",
         "summarizer": "summarizer",
         "sentiment": "sentiment",
@@ -90,6 +97,7 @@ graph.add_conditional_edges(
     tool_router,
     {
         "retriever": "retriever",
+        "web_search": "web_search",
         "general_qa": "general_qa",
         "summarizer": "summarizer",
         "sentiment": "sentiment",
@@ -102,6 +110,21 @@ graph.add_conditional_edges(
     tool_router,
     {
         "retriever": "retriever",
+        "web_search": "web_search",
+        "general_qa": "general_qa",
+        "summarizer": "summarizer",
+        "sentiment": "sentiment",
+        "code_explainer": "code_explainer",
+        END: "final_answer",
+    },
+)
+
+graph.add_conditional_edges(
+    "web_search",
+    tool_router,
+    {
+        "retriever": "retriever",
+        "web_search": "web_search",
         "general_qa": "general_qa",
         "summarizer": "summarizer",
         "sentiment": "sentiment",
