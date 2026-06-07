@@ -15,7 +15,9 @@ async def planner_node(
 
         history=state.conversation_history
 
-        plan = await create_plan(query, available_knowledge,history)
+        summary=state.conversation_summary
+
+        plan = await create_plan(query, available_knowledge,history,summary)
 
         return {
             "plan": plan,

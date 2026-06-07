@@ -9,11 +9,17 @@ async def retriever_node(
 ):
 
     try:
-
+        
         query = state.query
 
-        # queries = await get_relevant_queries(query)
-        queries =[Query(query='how to build agent from scratch'), Query(query='create AI agent from beginning'), Query(query='develop custom agent architecture'), Query(query='agent development guide')]
+        available_knowledge = state.available_knowledge
+
+        history=state.conversation_history
+
+        summary=state.conversation_summary
+
+
+        queries = await get_relevant_queries(query=query,available_knowledge=available_knowledge,history=history,summary=summary)
 
         
         relevant_chunks = await retrieve_relevant_chunks_with_queries(queries)  # type: ignore

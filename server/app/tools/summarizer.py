@@ -1,9 +1,10 @@
 from fastapi import HTTPException
+from agent.state import Message
 from services.llm_service import llm
 from prompts.summarization_prompt import summarization_prompt
 
 
-async def summarize_content(content: str, query: str) -> str:
+async def summarize_content(content: str, query: str,available_knowledge: list[str], history: list[Message], summary: str) -> str:
     """
     Summarizes the given content using a language model.
 
@@ -15,13 +16,31 @@ async def summarize_content(content: str, query: str) -> str:
     """
     # Generate the prompt with the provided content
     try:
-        prompt = summarization_prompt.format(content=content, query=query)
+        available_knowledge_text = "\n".join(
+                    available_knowledge
+                )
 
-        # Use the language model to generate a summary based on the prompt
-        summary = llm.invoke([prompt])
+        history_text = "\n".join(
+                    [
+                        f"{msg.role.upper()}: {msg.content}"
+                        for msg in history
+                    ]
+                )
 
-        return summary.content
+        prompt = summarization_prompt.format(
+                    content=content,
+                    query=query,
+                    available_knowledge=available_knowledge_text,
+                    summary=summary,
+                    history=history_text,
+                )
 
+        response = llm.invoke(
+                    prompt
+                )
+
+        return response.content # type: ignore
+    
     except Exception as e:
 
         raise HTTPException(

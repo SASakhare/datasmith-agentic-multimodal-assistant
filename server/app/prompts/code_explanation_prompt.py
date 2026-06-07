@@ -1,33 +1,44 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-
-code_explanation_prompt = ChatPromptTemplate.from_template(
-    """
-    You are a helpful assistant that explains code. Produce output exactly in the following structure and nothing else.
-
-    Return:
-
-    1. One-line summary:
-    A single concise sentence describing what the code does.
-
-    2. Three bullet points:
-    - Bullet 1: key idea or behavior
-    - Bullet 2: important details or assumptions
-    - Bullet 3: noteworthy side-effects or limitations
-
-    3. Five-sentence detailed explanation:
-    Write exactly five sentences that together cover:
-    - Purpose of the code
-    - Line-by-line explanation (summarize key lines/blocks)
-    - Any bugs, pitfalls, or edge cases (or "None" if there are none)
-    - Time complexity (Big-O)
-    - A final brief suggestion or improvement
+CODE_EXPLANATION_PROMPT = """
+    You are an expert software engineer and code reviewer.
 
     Code:
     {code}
 
-    User Query:
+    Available Knowledge:
+    {available_knowledge}
+
+    Conversation Summary:
+    {summary}
+
+    Recent Conversation History:
+    {history}
+
+    User Request:
     {query}
 
+    Instructions:
+
+    - Explain the code clearly and accurately.
+    - Use conversation history to resolve references such as:
+    - this code
+    - previous code
+    - that function
+    - continue explaining
+
+    - Explain:
+    1. Purpose
+    2. Flow of execution
+    3. Functions and classes
+    4. Important logic
+    5. Inputs and outputs
+    6. Potential issues or improvements
+
+    - If requested, explain line by line.
+    - If requested, explain for beginners.
+    - If requested, explain advanced concepts in detail.
+    - Do not invent code that is not present.
     """
-)
+
+code_explanation_prompt = ChatPromptTemplate.from_template(CODE_EXPLANATION_PROMPT)

@@ -4,6 +4,7 @@ from agent.state import Message
 from prompts.planner_prompt import PLANNER_PROMPT
 from services.llm_service import llm  # type: ignore
 from fastapi import HTTPException
+from agent.state import Message
 
 
 class PlanStep(BaseModel):
@@ -22,27 +23,42 @@ class ExecutionPlan(BaseModel):
 
 llm_with_ExecutionPlan = llm.with_structured_output(ExecutionPlan)
 
+from fastapi import HTTPException
 
-async def create_plan(query: str, available_knowledge: list[str],history:list[Message]):
+
+async def create_plan(
+    query: str, available_knowledge: list[str], history: list[Message], summary: str
+):
+
     try:
 
-        available_knowledges = "\n".join(available_knowledge)
+        available_knowledge_text = "\n".join(available_knowledge)
+
+        history_text = "\n".join([f"{msg.role}: {msg.content}" for msg in history])
 
         prompt = f"""
-            {
-                PLANNER_PROMPT.format(available_knowledge=available_knowledges)
-            }
-            
-            User Query :
-            {query}
-            """
+                    {PLANNER_PROMPT.format(
+                        available_knowledge=available_knowledge_text
+                    )}
+
+                    Conversation Summary:
+                    {summary if summary else "No previous conversation summary available."}
+
+                    Recent Conversation History:
+                    {history_text if history_text else "No recent conversation history available."}
+
+                    Current User Query:
+                    {query}
+                    """
 
         response = llm_with_ExecutionPlan.invoke(prompt)
 
         return response
 
     except Exception as e:
+
         print(e)
+
         raise HTTPException(
             status_code=500,
             detail={

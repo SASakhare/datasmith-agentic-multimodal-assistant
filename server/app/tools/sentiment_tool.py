@@ -2,19 +2,48 @@ from services.llm_service import llm
 from prompts.sentiment_prompt import sentiment_prompt
 
 
-async def analyze_sentiment(content: str,query: str) -> str:
-    """
-    Analyzes the sentiment of the given content using a language model.
+from fastapi import HTTPException
+
+from agent.state import Message
 
 
+async def analyze_sentiment(
+    content: str,
+    query: str,
+    available_knowledge: list[str],
+    history: list[Message],
+    summary: str,
+) -> str:
 
-    Returns:
-        str: The sentiment analysis result.
-    """
-    # Generate the prompt with the provided content
-    prompt = sentiment_prompt.format(content=content,query=query)
+    try:
 
-    # Use the language model to generate a sentiment analysis based on the prompt
-    sentiment = llm.invoke([prompt])
+        available_knowledge_text = "\n".join(available_knowledge)
 
-    return sentiment.content
+        history_text = "\n".join(
+            [f"{msg.role.upper()}: {msg.content}" for msg in history]
+        )
+
+        prompt = sentiment_prompt.format(
+            content=content,
+            query=query,
+            available_knowledge=available_knowledge_text,
+            summary=summary,
+            history=history_text,
+        )
+
+        response = llm.invoke(prompt)
+
+        return response.content # type: ignore
+
+    except Exception as e:
+
+        print(e)
+
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "message": "Sentiment Analysis Tool Failed",
+                "error": str(e),
+            },
+        )

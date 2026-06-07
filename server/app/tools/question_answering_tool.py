@@ -1,9 +1,10 @@
 from fastapi import HTTPException
+from agent.state import Message
 from services.llm_service import llm
 from prompts.question_answering_prompt import question_answer_prompt  # type: ignore
 
 
-async def answer_question(content: str, question: str) -> str:
+async def answer_question(content: str, question: str, available_knowledge: list[str], history: list[Message], summary: str) -> str:
     """
     Answers a question about the given content using a language model.
 
@@ -16,12 +17,31 @@ async def answer_question(content: str, question: str) -> str:
     """
     # Build the prompt with the provided content and question
     try:
-        prompt = question_answer_prompt.format(content=content, question=question)
+        available_knowledge_text = "\n".join(
+                    available_knowledge
+                )
 
-        # Invoke the language model (support synchronous or awaitable results)
-        response = llm.invoke([prompt])
+        history_text = "\n".join(
+                    [
+                        f"{msg.role.upper()}: {msg.content}"
+                        for msg in history
+                    ]
+                )
+
+        prompt = question_answer_prompt.format(
+                    content=content,
+                    question=question,
+                    available_knowledge=available_knowledge_text,
+                    summary=summary,
+                    history=history_text,
+                )
+
+        response = llm.invoke(
+                    prompt
+                )
+        
         # Return the content of the model response (fallback to string conversion)
-        return response.content
+        return response.content # type: ignore
 
     except Exception as e:
 

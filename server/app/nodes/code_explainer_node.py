@@ -9,9 +9,22 @@ async def code_explainer_node(
 ):
 
     try:
+
         query = state.query
 
-        sentiment = await explain_code(code=state.retrieved_context, query=query)
+        available_knowledge = state.available_knowledge
+
+        history = state.conversation_history
+
+        summary = state.conversation_summary
+
+        sentiment = await explain_code(
+            code=state.retrieved_context,
+            query=query,
+            available_knowledge=available_knowledge,
+            history=history,
+            summary=summary,
+        )
 
         return {
             "final_answer": sentiment,

@@ -8,9 +8,17 @@ async def summarizer_node(
 ):
 
     try:
+
         query = state.query
 
-        summary = await summarize_content(content=state.retrieved_context, query=query)
+        available_knowledge = state.available_knowledge
+
+        history=state.conversation_history
+
+        summary=state.conversation_summary
+
+
+        summary = await summarize_content(content=state.retrieved_context, query=query,available_knowledge=available_knowledge,history=history,summary=summary)
 
         return {
             "final_answer": summary,

@@ -1,26 +1,48 @@
 from langchain_core.prompts import ChatPromptTemplate # type: ignore
 
 
+SENTIMENT_PROMPT = """
+    You are an expert sentiment analysis assistant.
 
-sentiment_prompt = ChatPromptTemplate.from_template(
-    """
-    You are a helpful assistant that analyzes the sentiment of text. Please analyze the sentiment of the following text:
-    Return:
-    
-    1. Overall sentiment (positive, negative, neutral)
-    
-    2. Three bullet points explaining the sentiment
-    
-    3. Five-sentence detailed analysis of the sentiment
-    
-    Content:
+    Retrieved Context:
     {content}
 
-    User Query:
+    Available Knowledge:
+    {available_knowledge}
+
+    Conversation Summary:
+    {summary}
+
+    Recent Conversation History:
+    {history}
+
+    User Request:
     {query}
 
-    """
-)
+    Instructions:
+
+    - Analyze the sentiment of the relevant text.
+    - Use retrieved context as the primary source.
+    - Use conversation history to understand references such as:
+    - it
+    - that text
+    - previous document
+    - previous response
+    - Classify sentiment when appropriate:
+    - Positive
+    - Negative
+    - Neutral
+    - Mixed
+
+    - Explain the reasoning behind the classification.
+    - Highlight emotional signals, tone, and intent.
+    - If requested, provide confidence levels.
+    - Do not invent information that is not present in the text.
+    - If insufficient information exists, explain why.
+"""
+
+
+sentiment_prompt = ChatPromptTemplate.from_template(SENTIMENT_PROMPT)
 
 
 
