@@ -1,4 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { QueryClient} from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -7,7 +8,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect  } from "react";
+import type {ReactNode} from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -18,7 +20,7 @@ function NotFoundComponent() {
     <div className="relative flex min-h-screen flex-col">
       <div className="pointer-events-none absolute inset-0 hero-gradient" />
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-20">
-        <div className="w-full max-w-xl rounded-3xl border border-border bg-card/70 p-10 text-center shadow-[var(--shadow-elegant)] backdrop-blur">
+        <div className="w-full max-w-xl rounded-3xl border border-border bg-card/70 p-10 text-center shadow-(--shadow-elegant) backdrop-blur">
           <div className="mx-auto mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-primary">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
           </div>
@@ -28,7 +30,7 @@ function NotFoundComponent() {
             The agent couldn't find the knowledge you were looking for. The node may have been moved, deleted, or never existed in the current graph.
           </p>
           <div className="mt-7">
-            <Link to="/" className="inline-flex items-center gap-2 rounded-lg bg-[image:var(--gradient-primary)] px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-[var(--shadow-elegant)] transition-transform hover:scale-[1.02]">
+            <Link to="/" className="inline-flex items-center gap-2 rounded-lg bg-(image:--gradient-primary) px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-(--shadow-elegant) transition-transform hover:scale-[1.02]">
               ← Back to Home
             </Link>
           </div>
