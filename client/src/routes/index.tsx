@@ -462,7 +462,7 @@ function Landing() {
       {/* CTA */}
       <section className="cta-section mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div
-          className="cta-card relative overflow-hidden rounded-3xl border border-border bg-[image:var(--gradient-primary)] p-10 text-center text-primary-foreground sm:p-14"
+          className="cta-card relative overflow-hidden rounded-3xl border border-border bg-(image:--gradient-primary) p-10 text-center text-primary-foreground sm:p-14"
           style={{ opacity: 0 }}
         >
           <div

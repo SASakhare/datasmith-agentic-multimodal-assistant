@@ -237,18 +237,20 @@ function LoginPage() {
         <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-10">
           <div
             ref={cardRef}
-            className="w-full max-w-md rounded-3xl border border-border bg-card/80 p-8 shadow-[var(--shadow-elegant)] backdrop-blur"
+            className="w-full max-w-md rounded-3xl border border-border bg-card/80 p-8 shadow-(--shadow-elegant) backdrop-blur"
             style={{ opacity: 0 }}
           >
             {/* Heading */}
-            <h1 className="card-heading text-2xl font-semibold tracking-tight" style={{ opacity: 0 }}>
-              Welcome back
+            <h1 className="card-heading text-2xl text-center font-semibold tracking-tight" style={{ opacity: 0 }}>
+              Welcome To DataSmith
             </h1>
-            <p className="card-sub mt-1 text-sm text-muted-foreground" style={{ opacity: 0 }}>
+            <p className="card-sub mt-1 text-sm text-center text-muted-foreground" style={{ opacity: 0 }}>
               Sign in to continue to your workspace.
             </p>
 
             {/* Google button */}
+
+            {/* //* button to trigger the sing in with google */}
             <button
               className="google-btn mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface-elevated px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-accent hover:scale-[1.01] active:scale-[0.99]"
               style={{ opacity: 0 }}
@@ -270,6 +272,8 @@ function LoginPage() {
               <Field icon={Lock} label="Password" type="password" placeholder="••••••••" />
 
               <div className="forgot-link flex justify-end" style={{ opacity: 0 }}>
+
+                {/* // * we have to add forgot password functionality */}
                 <a
                   href="#"
                   className="text-xs text-muted-foreground transition-colors hover:text-primary"
@@ -286,6 +290,7 @@ function LoginPage() {
                 style={{ opacity: 0 }}
               >
                 {/* Shimmer overlay while loading */}
+                {/* //* showing the status of sining */}
                 {loading && <span className="btn-shimmer" />}
 
                 {loading ? (

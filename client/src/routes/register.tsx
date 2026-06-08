@@ -186,14 +186,14 @@ function RegisterPage() {
         <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-10">
           <div
             ref={cardRef}
-            className="w-full max-w-md rounded-3xl border border-border bg-card/80 p-8 shadow-[var(--shadow-elegant)] backdrop-blur"
+            className="w-full max-w-md rounded-3xl border border-border bg-card/80 p-8 shadow-(--shadow-elegant) backdrop-blur"
             style={{ opacity: 0 }}
           >
             {/* Heading */}
-            <h1 className="reg-heading text-2xl font-semibold tracking-tight" style={{ opacity: 0 }}>
+            <h1 className="reg-heading text-2xl text-center font-semibold tracking-tight" style={{ opacity: 0 }}>
               Create your account
             </h1>
-            <p className="reg-sub mt-1 text-sm text-muted-foreground" style={{ opacity: 0 }}>
+            <p className="reg-sub mt-1 text-sm text-center text-muted-foreground" style={{ opacity: 0 }}>
               Start chatting with your knowledge in minutes.
             </p>
 

@@ -291,7 +291,7 @@ function About() {
             </div>
 
             <div
-              className="mission-card rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]"
+              className="mission-card rounded-3xl border border-border bg-card p-8 shadow-(--shadow-elegant)"
               style={{ opacity: 0 }}
             >
               <ul className="space-y-3 text-sm">
@@ -301,7 +301,7 @@ function About() {
                     className="mission-bullet flex gap-3"
                     style={{ opacity: 0 }}
                   >
-                    <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
                     {b}
                   </li>
                 ))}
@@ -331,7 +331,7 @@ function About() {
               {tech.map((t) => (
                 <div
                   key={t.title}
-                  className="tech-card rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[var(--shadow-elegant)]"
+                  className="tech-card rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-(--shadow-elegant)"
                   style={{ opacity: 0 }}
                 >
                   <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-primary">
@@ -389,20 +389,25 @@ function About() {
             Get in Touch
           </h2>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {/* //* Email page redirection */}
             <a
               href="mailto:hello@datasmith.ai"
               className="contact-link inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm hover:bg-accent transition-colors"
               style={{ opacity: 0 }}
-            >
+              >
               <Mail className="h-4 w-4" /> hello@datasmith.ai
             </a>
+
+            
+              {/* //* LinkedIn page redirection */}
             <a
               href="#"
               className="contact-link inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm hover:bg-accent transition-colors"
               style={{ opacity: 0 }}
-            >
+              >
               <Linkedin className="h-4 w-4" /> LinkedIn
             </a>
+              {/* //* GitHub page redirection */}
             <a
               href="#"
               className="contact-link inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm hover:bg-accent transition-colors"

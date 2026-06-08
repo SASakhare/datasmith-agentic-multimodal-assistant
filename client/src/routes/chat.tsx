@@ -215,7 +215,9 @@ function ChatPage() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate agent latency 1.2–2s
+    // Simulate agent latency 1.2–2s\
+
+    // * here we call and get response from the agent 
     setTimeout(
       () => {
         setIsTyping(false);
@@ -331,11 +333,13 @@ function ChatPage() {
                   : <PanelLeftOpen className="h-4 w-4" />}
               </button>
               <div>
+                {/* // * showing the title of Chat */}
                 <div className="text-sm font-semibold">Q3 revenue analysis</div>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  {/* //* showing the agent state */}
                   </span>
                   Agent ready
                 </div>
@@ -449,7 +453,8 @@ function ChatPage() {
               Context & Activity
             </div>
           </div>
-
+            
+            {/* //* here showing the agent state what it use and sources cites */}
           <div className="flex-1 overflow-y-auto p-4 min-w-77.5">
             {/* Active Sources */}
             <div className="mb-5">
@@ -474,7 +479,7 @@ function ChatPage() {
                 ))}
               </div>
             </div>
-
+              {/* //* agent trace */}
             {/* Agent trace */}
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
