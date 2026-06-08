@@ -1,30 +1,29 @@
-from fastapi import Depends
+from fastapi import Cookie
 from fastapi import HTTPException
-from fastapi.security import HTTPBearer
-from fastapi.security import HTTPAuthorizationCredentials
 
 from services.jwt_service import verify_access_token
 
 from repositories.user_repository import (
-    get_user_by_id
+    get_user_by_id,
 )
 
-security = HTTPBearer()
 
+async def get_current_user(access_token: str | None = Cookie(default=None)):
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
+    if access_token is None:
 
-    token = credentials.credentials
+        raise HTTPException(
+            status_code=401,
+            detail="Not authenticated",
+        )
 
-    payload = verify_access_token(token)
+    payload = verify_access_token(access_token)
 
     if payload is None:
 
         raise HTTPException(
             status_code=401,
-            detail="Invalid token"
+            detail="Invalid token",
         )
 
     user_id = payload["sub"]
@@ -35,7 +34,7 @@ async def get_current_user(
 
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
     return user

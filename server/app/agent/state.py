@@ -1,6 +1,18 @@
 from pydantic import BaseModel
-from agent.planner import ExecutionPlan
 from typing import List
+
+class PlanStep(BaseModel):
+    tool: str
+    reason: str
+
+
+class ExecutionPlan(BaseModel):
+    intent: str
+    need_rag: bool
+    need_human_approval: bool
+    need_clarification: bool
+    clarification_question: str | None = None
+    steps: List[PlanStep]
 
 
 class Message(BaseModel):
@@ -36,3 +48,7 @@ class AgentState(BaseModel):
     human_approved: bool
 
     available_knowledge: list[str] = []
+
+
+
+

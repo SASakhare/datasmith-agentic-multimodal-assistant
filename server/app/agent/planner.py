@@ -1,24 +1,10 @@
 from pydantic import BaseModel
 from typing import List
-from agent.state import Message
+from agent.state import *
 from prompts.planner_prompt import PLANNER_PROMPT
 from services.llm_service import llm  # type: ignore
 from fastapi import HTTPException
 from agent.state import Message
-
-
-class PlanStep(BaseModel):
-    tool: str
-    reason: str
-
-
-class ExecutionPlan(BaseModel):
-    intent: str
-    need_rag: bool
-    need_human_approval: bool
-    need_clarification: bool
-    clarification_question: str | None = None
-    steps: List[PlanStep]
 
 
 llm_with_ExecutionPlan = llm.with_structured_output(ExecutionPlan)
