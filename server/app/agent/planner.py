@@ -1,11 +1,10 @@
 from pydantic import BaseModel
 from typing import List
-from agent.state import *
-from prompts.planner_prompt import PLANNER_PROMPT
-from services.llm_service import llm  # type: ignore
+from app.agent.state import *
+from app.prompts.planner_prompt import PLANNER_PROMPT
+from app.services.llm_service import llm  # type: ignore
 from fastapi import HTTPException
-from agent.state import Message
-
+from app.agent.state import Message
 
 llm_with_ExecutionPlan = llm.with_structured_output(ExecutionPlan)
 

@@ -1,11 +1,10 @@
-from agent.planner import ExecutionPlan, PlanStep
-from rag.retriever import retrieve_relevant_chunks_with_queries
-from tools.code_explainer import explain_code
-from tools.question_answering_tool import answer_question
-from tools.retriver_prompt_generator import get_relevant_queries
-from tools.sentiment_tool import analyze_sentiment
-from tools.summarizer import summarize_content
-
+from app.agent.planner import ExecutionPlan, PlanStep
+from app.rag.retriever import retrieve_relevant_chunks_with_queries
+from app.tools.code_explainer import explain_code
+from app.tools.question_answering_tool import answer_question
+from app.tools.retriver_prompt_generator import get_relevant_queries
+from app.tools.sentiment_tool import analyze_sentiment
+from app.tools.summarizer import summarize_content
 
 async def execute_plan(plan: ExecutionPlan, query: str):
 

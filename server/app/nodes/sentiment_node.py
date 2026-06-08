@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from agent.state import AgentState
-from tools.sentiment_tool import analyze_sentiment
+from app.agent.state import AgentState
+from app.tools.sentiment_tool import analyze_sentiment
 
 
 async def sentiment_node(

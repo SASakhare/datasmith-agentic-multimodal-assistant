@@ -1,8 +1,7 @@
 from fastapi import HTTPException
-from agent.state import Message
-from services.llm_service import llm
-from prompts.summarization_prompt import summarization_prompt
-
+from app.agent.state import Message
+from app.services.llm_service import llm
+from app.prompts.summarization_prompt import summarization_prompt
 
 async def summarize_content(
     content: str,

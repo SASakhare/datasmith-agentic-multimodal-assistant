@@ -1,9 +1,10 @@
 from fastapi import HTTPException
-from agent.state import Message
-from services.llm_service import llm
-from prompts.retriver_prompt import query_generation_prompt
+from app.agent.state import Message
+from app.services.llm_service import llm
+from app.prompts.retriver_prompt import query_generation_prompt
 from pydantic import BaseModel, Field
 from typing import List
+
 
 
 class Query(BaseModel):

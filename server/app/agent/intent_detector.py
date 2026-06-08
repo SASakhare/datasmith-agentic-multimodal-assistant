@@ -1,5 +1,5 @@
-from services.llm_service import llm
-from prompts.intent_detector_prompt import intent_detector_prompt
+from app.services.llm_service import llm
+from app.prompts.intent_detector_prompt import intent_detector_prompt
 
 
 async def detect_intent(question: str) -> str:

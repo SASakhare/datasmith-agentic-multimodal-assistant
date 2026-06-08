@@ -1,8 +1,9 @@
 from fastapi import HTTPException
 
-from services.web_search_service import web_search
+from app.services.web_search_service import web_search
 
-from agent.state import Message
+from app.agent.state import Message
+
 
 
 async def search_web(

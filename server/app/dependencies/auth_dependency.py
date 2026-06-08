@@ -1,9 +1,9 @@
 from fastapi import Cookie
 from fastapi import HTTPException
 
-from services.jwt_service import verify_access_token
+from app.services.jwt_service import verify_access_token
 
-from repositories.user_repository import (
+from app.repositories.user_repository import (
     get_user_by_id,
 )
 

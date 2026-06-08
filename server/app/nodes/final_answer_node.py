@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from agent.state import AgentState
+from app.agent.state import AgentState
 
 
 async def final_answer_node(state: AgentState):

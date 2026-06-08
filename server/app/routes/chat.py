@@ -1,17 +1,19 @@
 from uuid import uuid4
 from fastapi import APIRouter, Form, HTTPException
 from fastapi import UploadFile, File
-from agent.state import AgentState
-from rag.chunker import chunk_text
-from rag.key_word_extraction import extract_keywords
-from rag.vector_store import add_documents_to_vector_store
-from repositories.conversation_repository import build_agent_memory
-from services.chat_history_service import store_chat
-from services.file_processor import process_file
+from app.agent.state import AgentState
+from app.rag.chunker import chunk_text
+from app.rag.key_word_extraction import extract_keywords
+from app.repositories.conversation_repository import build_agent_memory
+from app.services.chat_history_service import store_chat
+from app.services.file_processor import process_file
 from typing import List, Optional
-from agent.graph import app_graph
-from dependencies.auth_dependency import get_current_user
+from app.dependencies.auth_dependency import get_current_user
 from fastapi import Depends
+
+
+from app.rag.vector_store import add_documents_to_vector_store
+from app.agent.graph import app_graph
 
 router = APIRouter()
 

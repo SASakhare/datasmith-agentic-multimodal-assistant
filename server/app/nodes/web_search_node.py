@@ -1,6 +1,6 @@
-from agent.state import AgentState
+from app.agent.state import AgentState
 
-from tools.web_search_tool import search_web
+from app.tools.web_search_tool import search_web
 
 
 async def web_search_node(

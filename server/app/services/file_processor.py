@@ -1,7 +1,7 @@
 from fastapi import UploadFile, File
-from .pdf_service import extract_text_from_pdf
-from .image_service import extract_text_from_image
-from .audio_service import transcribe_audio
+from app.services.pdf_service import extract_text_from_pdf
+from app.services.image_service import extract_text_from_image
+from app.services.audio_service import transcribe_audio
 
 
 async def process_file(file: UploadFile):
@@ -18,7 +18,7 @@ async def process_file(file: UploadFile):
             "content": text,
         }
 
-    if file.content_type.startswith("image/"):
+    if file.content_type.startswith("image/"): # type: ignore
 
         text = extract_text_from_image(content)
 
@@ -28,7 +28,7 @@ async def process_file(file: UploadFile):
             "content": text,
         }
 
-    if file.content_type.startswith("audio/"):
+    if file.content_type.startswith("audio/"): # type: ignore
         text = transcribe_audio(content)
 
         return {

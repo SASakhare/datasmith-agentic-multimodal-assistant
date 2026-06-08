@@ -1,15 +1,18 @@
 from fastapi import HTTPException
 
-from tools.retriver_prompt_generator import Query
-from .vector_store import qdrant
-from .embeddings import create_embedding
+from app.tools.retriver_prompt_generator import Query
+from app.rag.vector_store import qdrant
+from app.rag.embeddings import create_embedding
 
 
-retriever = qdrant.as_retriever(search_kwargs={"k": 5})
+def get_retriever():
+    return qdrant.as_retriever(search_kwargs={"k": 5})
 
 
 async def retrieve_relevant_chunks(query: str):
+
     try:
+        retriever = get_retriever()
 
         relevant_chunks = retriever.invoke(query)
 
@@ -29,6 +32,7 @@ async def retrieve_relevant_chunks(query: str):
 async def retrieve_relevant_chunks_with_queries(queries: list[Query]):
 
     try:
+
         relevant_chunks = []
         retriever = qdrant.as_retriever(search_kwargs={"k": 2})
 

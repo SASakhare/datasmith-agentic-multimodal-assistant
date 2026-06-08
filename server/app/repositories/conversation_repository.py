@@ -1,7 +1,7 @@
 from datetime import datetime
-from database.collections import conversations_collection, messages_collection
-from prompts import message_summarization_prompt
-from services.llm_service import llm
+from app.database.collections import conversations_collection, messages_collection
+from app.prompts import message_summarization_prompt
+from app.services.llm_service import llm
 
 async def create_conversation(data: dict):
 

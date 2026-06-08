@@ -1,11 +1,7 @@
 from fastapi import HTTPException
-from agent.state import Message
-from services.llm_service import llm
-from prompts.code_explanation_prompt import code_explanation_prompt
-
-from fastapi import HTTPException
-
-from agent.state import Message
+from app.agent.state import Message
+from app.services.llm_service import llm
+from app.prompts.code_explanation_prompt import code_explanation_prompt
 
 
 async def explain_code(

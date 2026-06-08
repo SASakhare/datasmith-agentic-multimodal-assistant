@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from agent.state import AgentState
-from tools.summarizer import summarize_content
+from app.agent.state import AgentState
+from app.tools.summarizer import summarize_content
 
 
 async def summarizer_node(

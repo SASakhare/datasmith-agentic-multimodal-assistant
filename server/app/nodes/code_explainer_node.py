@@ -1,7 +1,7 @@
 from fastapi import HTTPException
-from agent.state import AgentState
-from tools.code_explainer import explain_code
-from tools.sentiment_tool import analyze_sentiment
+from app.agent.state import AgentState
+from app.tools.code_explainer import explain_code
+from app.tools.sentiment_tool import analyze_sentiment
 
 
 async def code_explainer_node(

@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from agent.state import AgentState
-from tools.question_answering_tool import answer_question
+from app.agent.state import AgentState
+from app.tools.question_answering_tool import answer_question
 
 
 async def qa_node(

@@ -1,17 +1,16 @@
 from langgraph.graph import StateGraph, END  # type: ignore
 
-from agent.state import AgentState
-from agent.tool_router import tool_router
+from app.agent.state import AgentState
+from app.agent.tool_router import tool_router
 
-from nodes.web_search_node import web_search_node
-from nodes.planner_node import planner_node
-from nodes.retriever_node import retriever_node
-from nodes.qa_node import qa_node
-from nodes.final_answer_node import final_answer_node
-from nodes.summarizer_node import summarizer_node
-from nodes.sentiment_node import sentiment_node
-from nodes.code_explainer_node import code_explainer_node  # type: ignore
-
+from app.nodes.web_search_node import web_search_node
+from app.nodes.planner_node import planner_node
+from app.nodes.retriever_node import retriever_node
+from app.nodes.qa_node import qa_node
+from app.nodes.final_answer_node import final_answer_node
+from app.nodes.summarizer_node import summarizer_node
+from app.nodes.sentiment_node import sentiment_node
+from app.nodes.code_explainer_node import code_explainer_node  # type: ignore
 # * graph nodes
 
 graph = StateGraph(AgentState)

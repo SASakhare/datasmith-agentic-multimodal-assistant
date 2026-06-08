@@ -1,7 +1,7 @@
 from fastapi import HTTPException
-from agent.state import Message
-from services.llm_service import llm
-from prompts.question_answering_prompt import question_answer_prompt  # type: ignore
+from app.agent.state import Message
+from app.services.llm_service import llm
+from app.prompts.question_answering_prompt import question_answer_prompt  # type: ignore
 
 
 async def answer_question(content: str, question: str, available_knowledge: list[str], history: list[Message], summary: str,web_context:str) -> str:

@@ -2,17 +2,21 @@ from datetime import datetime
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from fastapi import Depends
-from dependencies.auth_dependency import get_current_user
-from models.conversation import Conversation
-from repositories.conversation_repository import (
+from app.dependencies.auth_dependency import get_current_user
+from app.models.conversation import Conversation
+from app.repositories.conversation_repository import (
     create_conversation,
     delete_conversation,
     get_conversation,
     get_conversations,
     update_conversation,
 )
-from schemas.conversation_schema import CreateConversationRequest, UpdateConversationRequest
-from database.collections import conversations_collection
+from app.schemas.conversation_schema import (
+    CreateConversationRequest,
+    UpdateConversationRequest,
+)
+from app.database.collections import conversations_collection
+
 router = APIRouter()
 
 
@@ -30,6 +34,7 @@ async def crete(
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
         rag_content=[],
+        summary="",
     )
 
     await create_conversation(conversation.model_dump())
@@ -92,19 +97,13 @@ async def update(
 
     update_data["updated_at"] = datetime.utcnow()
 
-    result = await update_conversation(conversation_id,update_data)
+    result = await update_conversation(conversation_id, update_data)
 
     if result.modified_count == 0:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Conversation not found"
-        )
+        raise HTTPException(status_code=404, detail="Conversation not found")
 
-    return {
-        "success": True,
-        "message": "Conversation updated"
-    }
+    return {"success": True, "message": "Conversation updated"}
 
 
 # *delete the conversation  with conversation_id
@@ -114,27 +113,17 @@ async def delete(
     current_user=Depends(get_current_user),
 ):
 
-    conversation = await get_conversation(
-        conversation_id
-    )
+    conversation = await get_conversation(conversation_id)
 
     if not conversation:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Conversation not found"
-        )
+        raise HTTPException(status_code=404, detail="Conversation not found")
 
     if conversation["user_id"] != current_user["user_id"]:
 
-        raise HTTPException(
-            status_code=403,
-            detail="Unauthorized"
-        )
+        raise HTTPException(status_code=403, detail="Unauthorized")
 
-    await delete_conversation(
-        conversation_id
-    )
+    await delete_conversation(conversation_id)
 
     return {
         "success": True,

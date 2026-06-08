@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
-from database.collections import messages_collection
-from agent.state import Message
+from app.database.collections import messages_collection
+from app.agent.state import Message
 
 
 async def create_message(

@@ -1,7 +1,7 @@
 # services/chat_history_service.py
 
-from repositories.message_repository import create_message
-from repositories.conversation_repository import increment_message_count, update_conversation_summary
+from app.repositories.message_repository import create_message
+from app.repositories.conversation_repository import increment_message_count, update_conversation_summary
 
 
 async def store_chat(

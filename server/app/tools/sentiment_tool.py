@@ -1,10 +1,7 @@
-from services.llm_service import llm
-from prompts.sentiment_prompt import sentiment_prompt
-
-
 from fastapi import HTTPException
-
-from agent.state import Message
+from app.agent.state import Message
+from app.services.llm_service import llm
+from app.prompts.sentiment_prompt import sentiment_prompt
 
 
 async def analyze_sentiment(

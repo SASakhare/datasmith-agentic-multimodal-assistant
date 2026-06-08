@@ -1,7 +1,7 @@
 from fastapi import HTTPException
-from agent.state import AgentState
-from rag.retriever import retrieve_relevant_chunks_with_queries
-from tools.retriver_prompt_generator import Query, get_relevant_queries
+from app.agent.state import AgentState
+from app.rag.retriever import retrieve_relevant_chunks_with_queries
+from app.tools.retriver_prompt_generator import Query, get_relevant_queries
 
 
 async def retriever_node(

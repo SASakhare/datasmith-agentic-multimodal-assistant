@@ -1,13 +1,13 @@
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException, Response
 
-from models.user import User
-from repositories.user_repository import get_user_by_email
-from schemas.auth_schema import LoginRequest, RegisterRequest
-from services.auth_service import hash_password, verify_password
+from app.models.user import User
+from app.repositories.user_repository import get_user_by_email
+from app.schemas.auth_schema import LoginRequest, RegisterRequest
+from app.services.auth_service import hash_password, verify_password
 from datetime import datetime
-from repositories.user_repository import create_user
-from services.jwt_service import create_access_token
+from app.repositories.user_repository import create_user
+from app.services.jwt_service import create_access_token
 
 router = APIRouter()
 
@@ -63,7 +63,12 @@ async def login(request: LoginRequest, response: Response):
         samesite="lax",
         max_age=60 * 60 * 24 * 1,
     )
+    safe_user = dict(user)
+    safe_user.pop("hashed_password", None)
+    safe_user.pop("_id", None)
 
     return {
         "success": True,
+        "message": "User login successfully",
+        "user": safe_user,
     }

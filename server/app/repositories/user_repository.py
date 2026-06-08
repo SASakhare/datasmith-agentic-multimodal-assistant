@@ -1,4 +1,4 @@
-from database.collections import users_collection
+from app.database.collections import users_collection
 
 
 async def create_user(user: dict):
