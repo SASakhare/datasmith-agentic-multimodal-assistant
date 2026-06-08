@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useUserStore } from "#/store/useUserStore";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -20,13 +21,16 @@ export const Route = createFileRoute("/login")({
 export function Field({
   icon: Icon,
   label,
+  value,
+  setValue,
   ...props
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   const [focused, setFocused] = useState(false);
-  const [hasValue, setHasValue] = useState(false);
 
   return (
     <label className="field-item block">
@@ -47,9 +51,10 @@ export function Field({
         />
         <input
           {...props}
+          value={value}
           onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
-          onBlur={(e)  => { setFocused(false); props.onBlur?.(e); }}
-          onChange={(e) => { setHasValue(e.target.value.length > 0); props.onChange?.(e); }}
+          onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
+          onChange={(e) => { setValue(e.target.value) }}
           className="w-full rounded-lg border border-input bg-surface-elevated py-2.5 pl-10 pr-3 text-sm outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
         {/* Animated bottom-line accent that grows on focus */}
@@ -80,10 +85,16 @@ function GoogleIcon() {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 function LoginPage() {
-  const rootRef    = useRef<HTMLDivElement>(null);
-  const cardRef    = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(false);
-  const [done,    setDone]    = useState(false);
+
+  const navigate = useNavigate();
+
+  const rootRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const { login, loading, done } = useUserStore();
 
   // ── Mount animation ────────────────────────────────────────────────────────
   useGSAP(
@@ -112,57 +123,57 @@ function LoginPage() {
         { y: 18, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.55 }
       )
-      .fromTo(
-        ".card-sub",
-        { y: 12, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.45 },
-        "-=0.35"
-      )
-      .fromTo(
-        ".google-btn",
-        { y: 14, opacity: 0, scale: 0.97 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" },
-        "-=0.25"
-      )
-      .fromTo(
-        ".divider",
-        { scaleX: 0, opacity: 0 },
-        { scaleX: 1, opacity: 1, duration: 0.45 },
-        "-=0.2"
-      )
-      .fromTo(
-        ".field-item",
-        { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.45, stagger: 0.1 },
-        "-=0.2"
-      )
-      .fromTo(
-        ".forgot-link",
-        { opacity: 0 },
-        { opacity: 1, duration: 0.4 },
-        "-=0.1"
-      )
-      .fromTo(
-        ".submit-btn",
-        { y: 10, opacity: 0, scale: 0.97 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.3)" },
-        "-=0.15"
-      )
-      .fromTo(
-        ".signup-link",
-        { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.4 },
-        "-=0.15"
-      );
+        .fromTo(
+          ".card-sub",
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45 },
+          "-=0.35"
+        )
+        .fromTo(
+          ".google-btn",
+          { y: 14, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" },
+          "-=0.25"
+        )
+        .fromTo(
+          ".divider",
+          { scaleX: 0, opacity: 0 },
+          { scaleX: 1, opacity: 1, duration: 0.45 },
+          "-=0.2"
+        )
+        .fromTo(
+          ".field-item",
+          { y: 16, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, stagger: 0.1 },
+          "-=0.2"
+        )
+        .fromTo(
+          ".forgot-link",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.4 },
+          "-=0.1"
+        )
+        .fromTo(
+          ".submit-btn",
+          { y: 10, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.3)" },
+          "-=0.15"
+        )
+        .fromTo(
+          ".signup-link",
+          { opacity: 0, y: 8 },
+          { opacity: 1, y: 0, duration: 0.4 },
+          "-=0.15"
+        );
     },
     { scope: rootRef }
   );
 
   // ── Submit handler ─────────────────────────────────────────────────────────
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || done) return;
-    setLoading(true);
+
 
     // Animate the card to slightly scale down while loading
     gsap.to(cardRef.current, {
@@ -171,27 +182,19 @@ function LoginPage() {
       ease: "power2.out",
     });
 
-    setTimeout(() => {
-      setLoading(false);
-      setDone(true);
-      // Spring back
-      gsap.to(cardRef.current, {
-        scale: 1,
-        duration: 0.55,
-        ease: "back.out(1.6)",
-      });
-      // Subtle success shimmer on the card border
-      gsap.fromTo(
-        cardRef.current,
-        { boxShadow: "0 0 0 2px hsl(var(--primary) / 0.6)" },
-        {
-          boxShadow: "0 0 0 2px hsl(var(--primary) / 0)",
-          duration: 1.2,
-          ease: "power2.out",
-          delay: 0.2,
-        }
-      );
-    }, 1800);
+
+    // * api implementation :
+
+
+    const user = {
+      email: email,
+      password: password,
+    }
+    await login(user);
+
+    navigate({ to: "/", replace: true })
+
+
   };
 
   return (
@@ -268,8 +271,8 @@ function LoginPage() {
 
             {/* Form */}
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <Field icon={Mail} label="Email"    type="email"    placeholder="you@company.com" />
-              <Field icon={Lock} label="Password" type="password" placeholder="••••••••" />
+              <Field icon={Mail} label="Email" value={email} setValue={setEmail} type="email" placeholder="you@company.com" />
+              <Field icon={Lock} label="Password" value={password} setValue={setPassword} type="password" placeholder="••••••••" />
 
               <div className="forgot-link flex justify-end" style={{ opacity: 0 }}>
 
