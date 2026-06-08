@@ -3,6 +3,7 @@ import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { ArrowRight, Menu } from "lucide-react";
+import { useUserStore } from "#/store/useUserStore";
 
 const links: { to: string; label: string; hash?: boolean }[] = [
   { to: "/", label: "Home" },
@@ -36,16 +37,22 @@ export function Navbar() {
 
 
 export const MobileNavbar = () => {
+
+  const { isAuthenticated } = useUserStore();
   return (
     <div className="flex items-center gap-2">
       <ThemeToggle />
 
-      <Link
-        to="/register"
-        className="hidden sm:inline-flex items-center rounded-xl bg-(image:--gradient-primary) px-4 py-2 text-sm font-medium text-primary-foreground shadow-(--shadow-elegant)"
-      >
-        Get Started
-      </Link>
+      {!isAuthenticated &&
+        (
+          <Link
+            to="/register"
+            className="hidden sm:inline-flex items-center rounded-xl bg-(image:--gradient-primary) px-4 py-2 text-sm font-medium text-primary-foreground shadow-(--shadow-elegant)"
+          >
+            Get Started
+          </Link>
+        )
+      }
 
       <Sheet>
         <SheetTrigger asChild>

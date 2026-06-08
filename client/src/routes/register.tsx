@@ -1,11 +1,12 @@
-import { useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { Field } from "./login";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useUserStore } from "#/store/useUserStore";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
@@ -22,7 +23,7 @@ function StrengthMeter({ password }: { password: string }) {
   const score = (() => {
     if (!password) return 0;
     let s = 0;
-    if (password.length >= 8)  s++;
+    if (password.length >= 8) s++;
     if (password.length >= 12) s++;
     if (/[A-Z]/.test(password)) s++;
     if (/[0-9]/.test(password)) s++;
@@ -30,8 +31,8 @@ function StrengthMeter({ password }: { password: string }) {
     return s;
   })();
 
-  const label  = ["", "Weak", "Fair", "Good", "Strong", "Very strong"][score];
-  const color  = ["", "#ef4444", "#f97316", "#eab308", "#22c55e", "#10b981"][score];
+  const label = ["", "Weak", "Fair", "Good", "Strong", "Very strong"][score];
+  const color = ["", "#ef4444", "#f97316", "#eab308", "#22c55e", "#10b981"][score];
 
   if (!password) return null;
 
@@ -64,12 +65,25 @@ function GoogleIcon() {
 
 // ── Main page ────────────────────────────────────────────────────────────────
 function RegisterPage() {
+
+  const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [password, setPassword] = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [done,     setDone]     = useState(false);
+  const [cpassword, csetPassword] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const { loading, done, singup, isRegistered } = useUserStore();
+
+
+  useEffect(() => {
+    if (isRegistered) {
+      navigate({ to: "/login", replace: true })
+
+    }
+  }, [isRegistered])
 
   // ── Mount animation ────────────────────────────────────────────────────────
   useGSAP(
@@ -93,51 +107,44 @@ function RegisterPage() {
       // Inner content cascade — fires after card settles
       const tl = gsap.timeline({ delay: 0.48, defaults: { ease } });
 
-      tl.fromTo(".reg-heading", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 })
-        .fromTo(".reg-sub",     { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, "-=0.35")
-        .fromTo(".reg-google",  { y: 14, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, "-=0.25")
-        .fromTo(".reg-divider", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.4 }, "-=0.2")
+      tl.fromTo(".reg-heading", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 },)
+        .fromTo(".reg-sub", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, "-=0.35",)
+        .fromTo(".reg-google", { y: 14, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, "-=0.25",)
+        .fromTo(".reg-divider", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.4 }, "-=0.2",)
         .fromTo(
           ".reg-field",
           { y: 18, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.48, stagger: 0.09 },
           "-=0.2"
         )
-        .fromTo(".reg-submit",   { y: 10, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.3)" }, "-=0.1")
-        .fromTo(".reg-login",    { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, "-=0.15");
+        .fromTo(".reg-submit", { y: 10, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.3)" }, "-=0.1",)
+        .fromTo(".reg-login", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, "-=0.15",);
     },
     { scope: rootRef }
   );
 
   // ── Submit ─────────────────────────────────────────────────────────────────
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || done) return;
-    setLoading(true);
 
     gsap.to(cardRef.current, { scale: 0.984, duration: 0.22, ease: "power2.out" });
 
-    setTimeout(() => {
-      setLoading(false);
-      setDone(true);
+    // * api implementation :
 
-      // Spring the card back
-      gsap.to(cardRef.current, { scale: 1, duration: 0.6, ease: "back.out(1.7)" });
+    const user = {
+      name,
+      email,
+      password,
+    }
 
-      // Success glow ring on card
-      gsap.fromTo(
-        cardRef.current,
-        { boxShadow: "0 0 0 3px hsl(var(--primary) / 0.55)" },
-        { boxShadow: "0 0 0 3px hsl(var(--primary) / 0)", duration: 1.4, ease: "power2.out", delay: 0.2 }
-      );
+    await singup(user);
 
-      // Stagger-pop the field rows to confirm they're filled
-      gsap.fromTo(
-        ".reg-field",
-        { scale: 1 },
-        { scale: 1.012, yoyo: true, repeat: 1, duration: 0.18, stagger: 0.06, ease: "power1.inOut" }
-      );
-    }, 1900);
+    // navigate({
+    //   to: "/login",
+    //   replace: true,
+    // })
+
   };
 
   return (
@@ -215,12 +222,12 @@ function RegisterPage() {
 
               {/* Name */}
               <div className="reg-field" style={{ opacity: 0 }}>
-                <Field icon={User} label="Full name" placeholder="Jane Doe" />
+                <Field icon={User} label="Full name" value={name} setValue={setName} placeholder="Jane Doe" />
               </div>
 
               {/* Email */}
               <div className="reg-field" style={{ opacity: 0 }}>
-                <Field icon={Mail} label="Email" type="email" placeholder="you@company.com" />
+                <Field icon={Mail} label="Email" value={email} setValue={setEmail} type="email" placeholder="you@company.com" />
               </div>
 
               {/* Password + strength meter */}
@@ -228,6 +235,8 @@ function RegisterPage() {
                 <Field
                   icon={Lock}
                   label="Password"
+                  value={password}
+                  setValue={setPassword}
                   type="password"
                   placeholder="At least 8 characters"
                   onChange={(e) => setPassword(e.target.value)}
@@ -237,7 +246,7 @@ function RegisterPage() {
 
               {/* Confirm password */}
               <div className="reg-field" style={{ opacity: 0 }}>
-                <Field icon={Lock} label="Confirm password" type="password" placeholder="Repeat password" />
+                <Field icon={Lock} label="Confirm password" value={cpassword} setValue={csetPassword} type="password" placeholder="Repeat password" />
               </div>
 
               {/* Submit */}

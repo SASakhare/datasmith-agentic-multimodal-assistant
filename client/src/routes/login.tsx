@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
@@ -94,7 +94,7 @@ function LoginPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const { login, loading, done } = useUserStore();
+  const { login, loading, done, isAuthenticated } = useUserStore();
 
   // ── Mount animation ────────────────────────────────────────────────────────
   useGSAP(
@@ -192,10 +192,17 @@ function LoginPage() {
     }
     await login(user);
 
-    navigate({ to: "/", replace: true })
+    // navigate({ to: "/", replace: true })
 
 
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({ to: '/', replace: true })
+
+    }
+  }, [isAuthenticated])
 
   return (
     <>

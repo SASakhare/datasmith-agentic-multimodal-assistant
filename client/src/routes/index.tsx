@@ -22,6 +22,7 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useUserStore } from "#/store/useUserStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -120,6 +121,7 @@ const stack = ["FastAPI", "LangGraph", "Qdrant", "MongoDB", "React", "TypeScript
 
 function Landing() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useUserStore();
 
   useGSAP(
     () => {
@@ -329,12 +331,17 @@ function Landing() {
               >
                 Start Chatting <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
-              >
-                Create Account
-              </Link>
+              {
+                !isAuthenticated && (
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
+                  >
+                    Create Account
+                  </Link>
+
+                )
+              }
             </div>
           </div>
 
@@ -487,12 +494,17 @@ function Landing() {
               >
                 Start Chatting
               </Link>
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-medium backdrop-blur transition-colors hover:bg-white/20"
-              >
-                Create Account
-              </Link>
+              {
+                !isAuthenticated && (
+
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-medium backdrop-blur transition-colors hover:bg-white/20"
+                  >
+                    Create Account
+                  </Link>
+                )
+              }
             </div>
           </div>
         </div>

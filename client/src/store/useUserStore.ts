@@ -6,17 +6,18 @@ import axios from "axios"
 const API_END_POINT = "http://127.0.0.1:8000/auth"
 axios.defaults.withCredentials = true
 
+
 export type User = {
 
     user_id: string,
 
-    username: string,
+    name: string,
 
     email: string,
 }
 
 export type SingupInputState = {
-    username: string,
+    name: string,
     email: string,
     password: string,
 }
@@ -33,8 +34,9 @@ export type UserState = {
     loading: boolean,
     done: boolean,
     isAuthenticated: boolean,
+    isRegistered: boolean,
     isCheckingAuth: boolean
-
+    resetDone: () => void,
     singup: (input: SingupInputState) => Promise<void>,
     login: (input: LoginInputState) => Promise<void>,
     logout: () => Promise<void>,
@@ -49,11 +51,18 @@ export const useUserStore = create<UserState>()(persist((set) => ({
     done: false,
     isAuthenticated: false,
     isCheckingAuth: false,
+    isRegistered: false,
 
+
+    resetDone: () => {
+        set({
+            done: false,
+        });
+    },
     singup: async (input: SingupInputState) => {
         // console.log(input);
         try {
-            set({ loading: true });
+            set({ loading: true, isCheckingAuth: true });
 
             const response = await axios.post(`${API_END_POINT}/register`, input, {
                 headers: {
@@ -61,21 +70,28 @@ export const useUserStore = create<UserState>()(persist((set) => ({
                 }
             });
 
+            console.log(response);
+
+
             if (response.data.success) {
-                toast.success(response.data.message);
+                toast.success("Account created successfully");
                 set({
                     loading: false,
-                    done: true,
+                    isCheckingAuth: false,
+                    isRegistered: true,
                 });
+
             }
 
         } catch (error: any) {
-            console.log(error);
+            toast.error(error.response.data.message);
+            console.log(error.response);
             set({
                 loading: false,
                 done: false,
+                isCheckingAuth: false,
+                isRegistered: false,
             })
-            toast.error("Error while logging");
 
         }
 
@@ -83,7 +99,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
     login: async (input: LoginInputState) => {
 
         try {
-            set({ loading: true });
+            set({ loading: true, isCheckingAuth: true });
 
             const response = await axios.post(`${API_END_POINT}/login`, input, {
                 headers: {
@@ -93,19 +109,28 @@ export const useUserStore = create<UserState>()(persist((set) => ({
 
             if (response.data.success) {
                 toast.success(response.data.message);
+                console.log(response.data);
+
                 set({
+                    user: response.data.user,
                     loading: false,
                     done: true,
+                    isCheckingAuth: false,
+                    isAuthenticated: true,
                 });
+
+
             }
 
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            toast.error(error.response.data.message);
+            console.log(error.response);
             set({
                 loading: false,
                 done: false,
+                isCheckingAuth: false,
+                isAuthenticated: true,
             })
-            toast.error("Error while logging");
 
         }
     },

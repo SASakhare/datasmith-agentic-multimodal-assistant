@@ -1,4 +1,4 @@
-import type { QueryClient} from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -8,12 +8,13 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect  } from "react";
-import type {ReactNode} from "react";
+import { useEffect } from "react";
+import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "@/lib/theme";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -22,7 +23,7 @@ function NotFoundComponent() {
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-20">
         <div className="w-full max-w-xl rounded-3xl border border-border bg-card/70 p-10 text-center shadow-(--shadow-elegant) backdrop-blur">
           <div className="mx-auto mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-primary">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /><line x1="8" y1="11" x2="14" y2="11" /></svg>
           </div>
           <h1 className="text-7xl font-bold tracking-tight text-foreground">404</h1>
           <h2 className="mt-3 text-xl font-semibold text-primary">Page Not Found</h2>
@@ -105,6 +106,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <Toaster position="top-right" richColors />
         <Outlet />
       </ThemeProvider>
     </QueryClientProvider>
