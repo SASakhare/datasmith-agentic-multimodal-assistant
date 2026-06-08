@@ -130,8 +130,8 @@ function MessageBubble({ msg, onCopy }: { msg: Msg; onCopy: (id: string) => void
 
 // ─── Main page ───────────────────────────────────────────────────────────────
 function ChatPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [contextOpen, setContextOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [contextOpen, setContextOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
