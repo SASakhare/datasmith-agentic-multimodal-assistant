@@ -1,12 +1,13 @@
 from datetime import datetime
 from uuid import uuid4
-from fastapi import APIRouter, HTTPException
-from fastapi import Depends
+from fastapi import APIRouter, HTTPException, Response
+from fastapi import Depends, Request
 from app.dependencies.auth_dependency import get_current_user
 from app.models.conversation import Conversation
 from app.repositories.conversation_repository import (
     create_conversation,
     delete_conversation,
+    get_all_messages,
     get_conversation,
     get_conversations,
     update_conversation,
@@ -22,65 +23,107 @@ router = APIRouter()
 
 # * creating the conversation
 @router.post("/create")
-async def crete(
+async def create(
     request: CreateConversationRequest,
+    response: Response,
     current_user=Depends(get_current_user),
 ):
-    conversation = Conversation(
-        conversation_id=str(uuid4()),
-        user_id=current_user["user_id"],
-        title=request.title,
-        message_count=0,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-        rag_content=[],
-        summary="",
-    )
+    try:
 
-    await create_conversation(conversation.model_dump())
+        conversation = Conversation(
+            conversation_id=str(uuid4()),
+            user_id=current_user["user_id"],
+            title=request.title,
+            message_count=0,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+            rag_content=[],
+            summary="",
+        )
 
-    return {
-        "success": True,
-        "conversation": conversation,
-    }
+        await create_conversation(conversation.model_dump())
+        response.status_code = 201
+        return {
+            "success": True,
+            "message": "Now Start Chat",
+            "conversation": conversation,
+        }
+    except HTTPException as e:
+        # print(e.status_code)
+        print(e)
+        raise
+
+    except Exception as e:
+        response.status_code = 500
+        return {
+            "success": False,
+            "message": "error in creating new chat",
+        }
 
 
 # *get single the conversation  with conversation id
 @router.get("/{conversation_id}")
 async def get_conv_by_id(
     conversation_id: str,
+    response: Response,
     current_user=Depends(get_current_user),
 ):
 
-    conversation = await get_conversation(conversation_id)
+    try:
+        conversation = await get_conversation(conversation_id)
 
-    if not conversation:
+        if not conversation:
+            response.status_code = 404
+            return {
+                "success": False,
+                "message": "Requested Conversation Not Found",
+            }
 
-        raise HTTPException(status_code=404, detail="Conversation not found")
+        conversation["_id"] = str(conversation["_id"])
 
-    conversation["_id"] = str(conversation["_id"])
+        messages = await get_all_messages(conversation["conversation_id"])
 
-    return {
-        "success": True,
-        "conversation": conversation,
-    }
+        response.status_code = 200
+        return {
+            "success": True,
+            "message": "Conversation Fetch Successfully",
+            "conversation": conversation,
+            "messages": messages,
+        }
+
+    except Exception as e:
+        response.status_code = 500
+        return {
+            "success": False,
+            "message": "Error in Requested Conversation",
+        }
 
 
 # *get all the conversation  with user id
 @router.get("/user/all")
 async def get_all_conv(
+    response: Response,
     current_user=Depends(get_current_user),
 ):
-    conversations = await get_conversations(current_user["user_id"])
+    try:
+        conversations = await get_conversations(current_user["user_id"])
 
-    for conv in conversations:
-        conv["_id"] = str(conv["_id"])
+        for conv in conversations:
+            conv["_id"] = str(conv["_id"])
 
-    return {
-        "success": True,
-        "count": len(conversations),
-        "conversation": conversations,
-    }
+        response.status_code = 200
+        return {
+            "success": True,
+            "message": "Conversations Loading",
+            "count": len(conversations),
+            "conversations": conversations,
+        }
+    except Exception as e:
+        response.status_code = 404
+        return {
+            "success": False,
+            "message": "Error in Requested Conversation",
+        }
 
 
 # *update the conversation  with conversation_id
@@ -88,44 +131,79 @@ async def get_all_conv(
 async def update(
     conversation_id: str,
     request: UpdateConversationRequest,
+    response: Response,
     current_user=Depends(get_current_user),
 ):
-    update_data = {}
 
-    if request.title:
-        update_data["title"] = request.title
+    try:
+        update_data = {}
 
-    update_data["updated_at"] = datetime.utcnow()
+        if request.title:
+            update_data["title"] = request.title
 
-    result = await update_conversation(conversation_id, update_data)
+        update_data["updated_at"] = datetime.utcnow()
 
-    if result.modified_count == 0:
+        result = await update_conversation(conversation_id, update_data)
 
-        raise HTTPException(status_code=404, detail="Conversation not found")
+        if result.modified_count == 0:
+            response.status_code = 404
+            return {
+                "success": False,
+                "message": "Updated Conversation Not Found",
+            }
 
-    return {"success": True, "message": "Conversation updated"}
+        response.status_code = 200
+        return {
+            "success": True,
+            "message": "Conversation updated",
+            "conversation": result,
+        }
+
+    except Exception as e:
+        response.status_code = 500
+        return {
+            "success": True,
+            "message": "Server Error",
+        }
 
 
 # *delete the conversation  with conversation_id
 @router.delete("/delete/{conversation_id}")
 async def delete(
     conversation_id: str,
+    response: Response,
     current_user=Depends(get_current_user),
 ):
 
-    conversation = await get_conversation(conversation_id)
+    try:
+        conversation = await get_conversation(conversation_id)
 
-    if not conversation:
+        if not conversation:
+            response.status_code = 404
+            return {
+                "success": False,
+                "message": "Conversation not found",
+            }
 
-        raise HTTPException(status_code=404, detail="Conversation not found")
+        if conversation["user_id"] != current_user["user_id"]:
 
-    if conversation["user_id"] != current_user["user_id"]:
+            response.status_code = 403
+            return {
+                "success": False,
+                "message": "Unauthorized",
+            }
 
-        raise HTTPException(status_code=403, detail="Unauthorized")
+        await delete_conversation(conversation_id)
 
-    await delete_conversation(conversation_id)
+        response.status_code = 200
+        return {
+            "success": True,
+            "message": "Conversation deleted successfully",
+        }
 
-    return {
-        "success": True,
-        "message": "Conversation deleted successfully",
-    }
+    except Exception as e:
+        response.status_code = 500
+        return {
+            "success": True,
+            "message": "Error while Deleting Conversation",
+        }

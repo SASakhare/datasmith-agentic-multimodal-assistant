@@ -1,5 +1,5 @@
 from uuid import uuid4
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.models.user import User
 from app.repositories.user_repository import get_user_by_email
@@ -8,6 +8,7 @@ from app.services.auth_service import hash_password, verify_password
 from datetime import datetime
 from app.repositories.user_repository import create_user
 from app.services.jwt_service import create_access_token
+from app.dependencies.auth_dependency import get_current_user
 
 router = APIRouter()
 
@@ -94,6 +95,7 @@ async def login(request: LoginRequest, response: Response):
         return {
             "success": True,
             "message": "User login successfully",
+            "token": token,
             "user": safe_user,
         }
     except Exception as e:
@@ -103,3 +105,23 @@ async def login(request: LoginRequest, response: Response):
             "success": False,
             "message": "Error while logging",
         }
+
+
+@router.get("/logout")
+async def logout(response: Response, current_user=Depends(get_current_user)):
+    try:
+        response.delete_cookie(key="access_token")
+        return {
+            "success": True,
+            "message": "Logged out successfully",
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail={"success": False, "message": "Error while logging out"},
+        )

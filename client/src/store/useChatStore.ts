@@ -7,6 +7,8 @@ import { toast } from "sonner"
 
 const API_END_POINT = "http://127.0.0.1:8000/conversation"
 
+axios.defaults.withCredentials=true
+
 export type Message = {
     message_id: string,
 
@@ -91,8 +93,8 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
 
         } catch (error: any) {
-            console.log(error);
-            toast.error(error.response.data.message);
+            console.log(error.details);
+            // toast.error(error.details);
         }
 
     },
@@ -139,8 +141,8 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
         } catch (error: any) {
 
-            toast.error(error.response.data.message);
-            console.log(error.response.data);
+            toast.error(error.response.data['detail']["message"]);
+            console.log(error.response.data['detail']["message"]);
         }
 
     },

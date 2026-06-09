@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Plus, Search, Settings, LogOut, PanelLeftClose, PanelLeftOpen,
@@ -9,6 +9,8 @@ import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ConversationStore } from "@/store/useChatStore";
+import { useUserStore } from "#/store/useUserStore";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({
@@ -130,6 +132,8 @@ function MessageBubble({ msg, onCopy }: { msg: Msg; onCopy: (id: string) => void
 
 // ─── Main page ───────────────────────────────────────────────────────────────
 function ChatPage() {
+  const {logout}=useUserStore();
+  const { create_new_conversation } = ConversationStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -140,6 +144,17 @@ function ChatPage() {
   const contextRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleNewChat = async (e: any) => {
+
+    await create_new_conversation();
+
+  }
+
+  const handleLogout=async (e:any)=>{
+    await logout();
+
+  }
 
   // ── Sidebar open/close animation ──────────────────────────────────────────
   const prevSidebar = useRef(sidebarOpen);
@@ -270,7 +285,7 @@ function ChatPage() {
           </div>
 
           <div className="px-3 shrink-0">
-            <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-(image:--gradient-primary) px-3 py-2 text-sm font-medium text-primary-foreground shadow-(--shadow-elegant) hover:scale-[1.01] transition-transform">
+            <button onClick={handleNewChat} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-(image:--gradient-primary) px-3 py-2 text-sm font-medium text-primary-foreground shadow-(--shadow-elegant) hover:scale-[1.01] transition-transform">
               <Plus className="h-4 w-4" /> New Chat
             </button>
           </div>
@@ -311,9 +326,9 @@ function ChatPage() {
               <button className="rounded-md p-1.5 text-muted-foreground hover:bg-card hover:text-foreground shrink-0" aria-label="Settings">
                 <Settings className="h-4 w-4" />
               </button>
-              <Link to="/login" className="rounded-md p-1.5 text-muted-foreground hover:bg-card hover:text-foreground shrink-0" aria-label="Logout">
+              <div onClick={handleLogout} className="rounded-md p-1.5 text-muted-foreground hover:bg-card hover:text-foreground shrink-0" aria-label="Logout">
                 <LogOut className="h-4 w-4" />
-              </Link>
+              </div>
             </div>
           </div>
         </aside>
@@ -339,7 +354,7 @@ function ChatPage() {
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  {/* //* showing the agent state */}
+                    {/* //* showing the agent state */}
                   </span>
                   Agent ready
                 </div>
@@ -453,8 +468,8 @@ function ChatPage() {
               Context & Activity
             </div>
           </div>
-            
-            {/* //* here showing the agent state what it use and sources cites */}
+
+          {/* //* here showing the agent state what it use and sources cites */}
           <div className="flex-1 overflow-y-auto p-4 min-w-77.5">
             {/* Active Sources */}
             <div className="mb-5">
@@ -479,7 +494,7 @@ function ChatPage() {
                 ))}
               </div>
             </div>
-              {/* //* agent trace */}
+            {/* //* agent trace */}
             {/* Agent trace */}
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
