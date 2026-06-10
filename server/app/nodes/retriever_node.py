@@ -18,10 +18,10 @@ async def retriever_node(state: AgentState):
             summary=summary,
         )
 
-        conversation_id=state.conversation_id,
-        user_id=state.user_id,
+        conversation_id = (state.conversation_id,)
+        user_id = (state.user_id,)
 
-        relevant_chunks = await retrieve_relevant_chunks_with_queries(queries=queries,conversation_id=conversation_id,user_id=user_id) # type: ignore
+        relevant_chunks = await retrieve_relevant_chunks_with_queries(queries=queries, conversation_id=conversation_id, user_id=user_id)  # type: ignore
 
         seen = set()
         unique_chunks = []

@@ -55,7 +55,7 @@ def get_qdrant():
     qdrant = QdrantVectorStore(
         client=client,
         collection_name=collection_name, # type: ignore
-        embedding=embeddings_model,
+        embedding=embeddings_model, # type: ignore
         retrieval_mode=RetrievalMode.DENSE,
         vector_name="dense",
     )
