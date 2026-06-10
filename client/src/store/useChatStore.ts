@@ -152,7 +152,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
         } catch (error: any) {
 
-            console.log(error);
+            // console.log(error);
             toast.error(error.response.data['detail']['message'])
             return;
         }
@@ -169,7 +169,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
             if (response.data.success) {
                 toast.success(response.data.message)
-                console.log(response.data);
+                // console.log(response.data);
 
                 const planTitle = response.data.agent_state?.plan?.title
 
@@ -197,7 +197,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
             }
 
         } catch (error: any) {
-            console.log(error);
+            // console.log(error);
             toast.error(error.response.data['detail']['message'])
             return;
         }
@@ -207,11 +207,11 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
         try {
 
             const response = await axios.get(`${API_END_POINT}/${conversation_id}`);
-            console.log(response);
+            // console.log(response);
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                console.log(response.data.Messages);
+                // console.log(response.data.Messages);
 
                 set({
                     conversation: response.data.conversation,
@@ -226,7 +226,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
 
         } catch (error: any) {
-            console.log(error.details);
+            // console.log(error.details);
             // toast.error(error.details);
         }
 
@@ -240,7 +240,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                console.log(response.data);
+                // console.log(response.data);
 
 
                 set({
@@ -251,7 +251,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
 
         } catch (error: any) {
-            console.log(error);
+            // console.log(error);
             toast.error(error.response.data['detail']['message'])
 
             return;
@@ -290,7 +290,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
         } catch (error: any) {
 
             toast.error(error.response.data['detail']["message"]);
-            console.log(error.response.data['detail']["message"]);
+            // console.log(error.response.data['detail']["message"]);
         }
 
     },
@@ -315,7 +315,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
         } catch (error: any) {
 
             toast.error(error.response.data.message);
-            console.log(error.response.data);
+            // console.log(error.response.data);
         }
     },
 
@@ -335,7 +335,7 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
         } catch (error: any) {
 
             toast.error(error.response.data.message);
-            console.log(error.response.data);
+            // console.log(error.response.data);
         }
     }
 

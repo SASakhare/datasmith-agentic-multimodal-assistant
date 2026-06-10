@@ -71,7 +71,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
                 }
             });
 
-            console.log(response);
+            // console.log(response);
 
 
             if (response.data.success) {
@@ -86,7 +86,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
 
         } catch (error: any) {
             toast.error(error.response.data.message);
-            console.log(error.response);
+            // console.log(error.response);
             set({
                 loading: false,
                 done: false,
@@ -110,7 +110,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                console.log(response.data);
+                // console.log(response.data);
                 localStorage.setItem("access_token", response.data.token)
                 axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`
                 set({
@@ -125,7 +125,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
 
         } catch (error: any) {
             toast.error(error.response.data.message);
-            console.log(error.response);
+            // console.log(error.response);
             set({
                 loading: false,
                 done: false,
@@ -166,7 +166,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
 
         } catch (error: any) {
             toast.error(error.response.data.message);
-            console.log(error);
+            // console.log(error);
             
             set({
                 loading: false,
@@ -176,7 +176,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
     }
     ,
     checkAuthentication: async () => {
-        console.log("checking authentication");
+        // console.log("checking authentication");
 
     },
 
