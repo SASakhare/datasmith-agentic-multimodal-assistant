@@ -12,13 +12,49 @@ from app.repositories.conversation_repository import (
     get_conversations,
     update_conversation,
 )
+from app.repositories.message_repository import create_message
+
 from app.schemas.conversation_schema import (
     CreateConversationRequest,
     UpdateConversationRequest,
+    CreateMessageRequest,
 )
 from app.database.collections import conversations_collection
 
 router = APIRouter()
+
+
+# * creating the conversation
+@router.post("/create_message")
+async def create_message_(
+    request: CreateMessageRequest,
+    response: Response,
+    current_user=Depends(get_current_user),
+):
+    try:
+        Message = await create_message(
+            content=request.query,
+            conversation_id=request.conversation_id,
+            role=request.role,
+        )
+        response.status_code = 201
+        return {
+            "success": True,
+            "message": "message send successfully",
+            "Message": Message,
+            # "Message":"",
+        }
+    except HTTPException as e:
+        # print(e.status_code)
+        print(e)
+        raise
+
+    except Exception as e:
+        response.status_code = 500
+        return {
+            "success": False,
+            "message": "error in creating new chat",
+        }
 
 
 # * creating the conversation

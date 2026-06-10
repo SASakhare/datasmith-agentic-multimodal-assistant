@@ -14,6 +14,7 @@ from fastapi import Depends
 
 from app.rag.vector_store import add_documents_to_vector_store
 from app.agent.graph import app_graph
+from app.repositories.message_repository import create_message
 
 router = APIRouter()
 
@@ -74,21 +75,28 @@ async def chat(
 
         response = await app_graph.ainvoke(state.model_dump())  # type: ignore
 
-        await store_chat(
+        response_message=await store_chat(
             conversation_id=conversation_id,
             user_message=query,
             assistant_message=response["final_answer"],
-        )
+        ) # type: ignore
+
 
         return {
+            "success": True,
             "query": query,
-            "response": response,
+            "message": "response generated successfully",
+            "agent_state": response,
+            "response_message": response_message,
             "conversation_id": conversation_id,
         }
 
     except Exception as e:
-
+        print(e)
         raise HTTPException(
             status_code=500,
-            detail=str(e),
+            detail={
+                "success": False,
+                "message": "Error while generating Agent Response",
+            },
         )

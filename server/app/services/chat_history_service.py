@@ -13,13 +13,7 @@ async def store_chat(
     assistant_message: str,
 ):
 
-    await create_message(
-        conversation_id=conversation_id,
-        role="user",
-        content=user_message,
-    )
-
-    await create_message(
+    response_message=await create_message(
         conversation_id=conversation_id,
         role="assistant",
         content=assistant_message,
@@ -28,3 +22,5 @@ async def store_chat(
     await increment_message_count(conversation_id)
 
     await update_conversation_summary(conversation_id)
+
+    return response_message

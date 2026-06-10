@@ -2,6 +2,8 @@ from datetime import datetime
 from uuid import uuid4
 from app.database.collections import messages_collection
 from app.agent.state import Message
+from app.models.message import Message as Message_
+from fastapi import HTTPException
 
 
 async def create_message(
@@ -10,17 +12,28 @@ async def create_message(
     content: str,
 ):
 
-    message = {
-        "message_id": str(uuid4()),
-        "conversation_id": conversation_id,
-        "role": role,
-        "content": content,
-        "created_at": datetime.utcnow(),
-    }
+    try:
 
-    await messages_collection.insert_one(message)
+        message = Message_(
+            message_id=str(uuid4()),
+            conversation_id=conversation_id,
+            role=role,
+            content=content,
+            created_at=datetime.utcnow(),
+        )
 
-    return message
+        await messages_collection.insert_one(message.model_dump())
+
+        return message
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "message": "Error while sending Message",
+            },
+        )
 
 
 async def get_messages(conversation_id: str):

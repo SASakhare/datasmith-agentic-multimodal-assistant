@@ -12,7 +12,7 @@ class Message(BaseModel):
 
     content: str
 
-    timestamp: datetime
+    created_at:datetime
 
 
 
