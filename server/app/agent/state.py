@@ -7,6 +7,7 @@ class PlanStep(BaseModel):
 
 
 class ExecutionPlan(BaseModel):
+    title:str | None
     intent: str
     need_rag: bool
     need_human_approval: bool
@@ -24,6 +25,8 @@ class Message(BaseModel):
 class AgentState(BaseModel):
 
     query: str
+
+    user_id:str
 
     conversation_id: str
 

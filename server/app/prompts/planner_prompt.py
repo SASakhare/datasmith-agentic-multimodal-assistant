@@ -185,4 +185,39 @@ PLANNER_PROMPT = """
     retrieval is unnecessary.
 
     Generate the most accurate execution plan possible.
+
+    --------------------------------------------------
+    CONVERSATION TITLE GENERATION
+    --------------------------------------------------
+
+    You will also receive a flag: is_first_message
+
+    If is_first_message = true:
+
+    - Generate a short, descriptive conversation title
+      based on the user's query.
+    - The title should be 4 to 7 words maximum.
+    - The title should capture the topic clearly.
+    - Do NOT use generic titles like "New Chat" or "Hello".
+    - Do NOT use punctuation or quotes in the title.
+
+    Examples:
+
+    User: "Who is Harry Potter?"
+    Title: Harry Potter Character Overview
+
+    User: "Explain this Python sorting code"
+    Title: Python Sorting Code Explanation
+
+    User: "What is the latest news on AI?"
+    Title: Latest AI News Update
+
+    User: "Summarize the uploaded report"
+    Title: Uploaded Report Summary
+
+    If is_first_message = false:
+
+    - Set title as null.
+    - Do not generate a title.
+
 """

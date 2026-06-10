@@ -4,7 +4,10 @@ from fastapi import UploadFile, File
 from app.agent.state import AgentState
 from app.rag.chunker import chunk_text
 from app.rag.key_word_extraction import extract_keywords
-from app.repositories.conversation_repository import build_agent_memory
+from app.repositories.conversation_repository import (
+    build_agent_memory,
+    store_rag_content,
+)
 from app.services.chat_history_service import store_chat
 from app.services.file_processor import process_file
 from typing import List, Optional
@@ -36,7 +39,7 @@ async def chat(
             info = await process_file(file)
             process_file_info.append(info)
 
-        available_knowledge = []
+        available_knowledge = agent_memory["rag_content"]
 
         if len(process_file_info) > 0:
 
@@ -55,7 +58,14 @@ async def chat(
 
             chunk_docs = await chunk_text(combine_context)
 
-            await add_documents_to_vector_store(chunk_docs)
+            await add_documents_to_vector_store(
+                chunk_docs,
+                conversation_id=conversation_id,
+                user_id=current_user["user_id"],
+            )
+            await store_rag_content(
+                conversation_id=conversation_id, rag_content=available_knowledge
+            )
 
         state = AgentState(
             query=query,
@@ -71,16 +81,16 @@ async def chat(
             conversation_summary=agent_memory["summary"],
             web_context="",
             need_web_search=False,
+            user_id=current_user["user_id"],
         )
 
         response = await app_graph.ainvoke(state.model_dump())  # type: ignore
 
-        response_message=await store_chat(
+        response_message = await store_chat(
             conversation_id=conversation_id,
             user_message=query,
             assistant_message=response["final_answer"],
-        ) # type: ignore
-
+        )  # type: ignore
 
         return {
             "success": True,

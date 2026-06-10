@@ -118,13 +118,13 @@ async def get_conv_by_id(
         conversation["_id"] = str(conversation["_id"])
 
         messages = await get_all_messages(conversation["conversation_id"])
-
+        
         response.status_code = 200
         return {
             "success": True,
             "message": "Conversation Fetch Successfully",
             "conversation": conversation,
-            "messages": messages,
+            "Messages": messages,
         }
 
     except Exception as e:

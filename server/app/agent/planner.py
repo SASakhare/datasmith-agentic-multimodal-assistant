@@ -16,6 +16,7 @@ async def create_plan(
 ):
 
     try:
+        is_first_message = len(history) <= 1
 
         available_knowledge_text = "\n".join(available_knowledge)
 
@@ -34,6 +35,9 @@ async def create_plan(
 
                     Current User Query:
                     {query}
+
+                    \n\nis_first_message = {str(is_first_message).lower()}
+
                     """
 
         response = llm_with_ExecutionPlan.invoke(prompt)
