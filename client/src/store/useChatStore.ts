@@ -6,8 +6,9 @@ import { toast } from "sonner"
 
 
 const API_END_POINT = "http://127.0.0.1:8000/conversation"
+const API_END_POINT_CHAT = "http://127.0.0.1:8000/chat"
 
-axios.defaults.withCredentials=true
+axios.defaults.withCredentials = true
 
 export type Message = {
     message_id: string,
@@ -18,7 +19,7 @@ export type Message = {
 
     content: string,
 
-    timestamp: string,
+    created_at: string,
 }
 
 export type ConversationShow = {
@@ -38,18 +39,83 @@ export type Conversation = {
 
 export type QueryState = {
     query: string,
+    conversation_id: string,
+    role: string
+
 }
+
+
+export type PlanStep = {
+
+    tool: string,
+    reason: string,
+
+}
+
+export type ExecutionPlan = {
+
+    intent: string,
+    need_rag: boolean,
+    need_human_approval: boolean,
+    need_clarification: boolean,
+    clarification_question: string | null
+    steps: PlanStep[]
+}
+
+
+export type MessageAgent = {
+
+    role: string,
+    content: string,
+}
+
+
+export type AgentState = {
+
+
+    query: string,
+
+    conversation_id: string,
+
+    need_web_search: boolean,
+
+    web_context: string,
+
+    current_step: number,
+
+    conversation_history: Message[],
+
+    conversation_summary: string,
+
+    plan: ExecutionPlan | null
+
+    retrieved_context: string,
+
+    final_answer: string,
+
+    need_human_approval: boolean,
+
+    human_approved: boolean,
+
+    available_knowledge: string[],
+
+}
+
+
+
+
 
 export type ConversationState = {
 
     conversation: Conversation | null,
-
+    agentState: AgentState | null,
     messages: Message[],
 
     current_conversation: string,
     all_conversations: ConversationShow[],
 
-    send_query: (input: QueryState) => Promise<void>,
+    generate_response: (input: FormData, current_conversation: string) => Promise<void>,
+    create_message: (input: QueryState) => Promise<void>,
     get_conversation: (conversation_id: string) => Promise<void>,
     get_all_conversation: () => Promise<void>,
     create_new_conversation: () => Promise<void>,
@@ -63,12 +129,68 @@ export type ConversationState = {
 export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
     conversation: null,
+    agentState: null,
     messages: [],
     current_conversation: "",
     all_conversations: [],
 
-    send_query: async (input: QueryState) => {
-        console.log(input);
+    create_message: async (input: QueryState) => {
+        try {
+            const response = await axios.post(`${API_END_POINT}/create_message`, input, {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+
+
+            if (response.data.success) {
+                toast.success(response.data.message)
+                set((state) => ({
+                    messages: [...state.messages, response.data.Message]
+                }));
+            }
+
+        } catch (error: any) {
+
+            console.log(error);
+            toast.error(error.response.data['detail']['message'])
+            return;
+        }
+
+    }
+    ,
+    generate_response: async (input: FormData, current_conversation: string) => {
+
+
+        // * code for sending to agent:
+
+
+        try {
+
+            const response = await axios.post(`${API_END_POINT_CHAT}/${current_conversation}`, input, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            })
+
+
+            if (response.data.success) {
+                toast.success(response.data.message)
+
+                console.log(response.data);
+
+                set((state) => ({
+                    messages: [...state.messages, response.data.response_message],
+                    agentState: response.data.agent_state,
+                }));
+            }
+
+        } catch (error: any) {
+            console.log(error);
+            toast.error(error.response.data['detail']['message'])
+
+            return;
+        }
 
     },
 
@@ -136,6 +258,8 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
                 toast.success(response.data.message);
                 set({
                     conversation: response.data.conversation,
+                    current_conversation: response.data.conversation["conversation_id"],
+
                 });
             }
 

@@ -4,13 +4,17 @@ import {
   Plus, Search, Settings, LogOut, PanelLeftClose, PanelLeftOpen,
   PanelRightClose, PanelRightOpen, Send, Paperclip, Copy, RefreshCw,
   Sparkles, FileText, Globe, Bot, Database, Activity, Link2, CheckCheck,
+  ImageIcon,
+  Music,
+  X,
 } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ConversationStore } from "@/store/useChatStore";
-import { useUserStore } from "#/store/useUserStore";
+import { useUserStore } from "@/store/useUserStore";
+import MarkdownMessage from "@/components/MardownReact";
 
 export const Route = createFileRoute("/chat")({
   head: () => ({
@@ -37,7 +41,19 @@ const suggestions = [
   { icon: Bot, title: "Build a workflow", desc: "Design a multi-step agent" },
 ];
 
-type Msg = { id: string; role: "user" | "assistant"; content: string; copied?: boolean };
+type Msg = { message_id: string; conversation_id: string; role: string; content: string; created_at: string; copied?: boolean; };
+
+// message_id: string,
+
+// conversation_id: string,
+
+// role: string,
+
+// content: string,
+
+// created_at: string,
+
+// updated_at: string,
 
 // ─── Typing dots ────────────────────────────────────────────────────────────
 function TypingIndicator() {
@@ -105,13 +121,10 @@ function MessageBubble({ msg, onCopy }: { msg: Msg; onCopy: (id: string) => void
             <Bot className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1 rounded-2xl rounded-tl-sm border border-border bg-card px-4 py-3 text-sm shadow-sm">
-            <p className="leading-relaxed">{msg.content}</p>
-            <pre className="mt-3 overflow-x-auto rounded-lg border border-border bg-surface p-3 font-mono text-xs">
-              <code>{`agent.run(query="Q3 revenue", sources=["docs", "web"])`}</code>
-            </pre>
+            <MarkdownMessage content={msg.content} />
             <div className="mt-3 flex items-center gap-1 text-muted-foreground">
               <button
-                onClick={() => onCopy(msg.id)}
+                onClick={() => onCopy(msg.message_id)}
                 className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors hover:bg-accent hover:text-foreground"
               >
                 {msg.copied
@@ -132,11 +145,11 @@ function MessageBubble({ msg, onCopy }: { msg: Msg; onCopy: (id: string) => void
 
 // ─── Main page ───────────────────────────────────────────────────────────────
 function ChatPage() {
-  const {logout}=useUserStore();
-  const { create_new_conversation } = ConversationStore();
+  const { logout } = useUserStore();
+  const { create_new_conversation, conversation, messages, generate_response, create_message, current_conversation, agentState } = ConversationStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([]);
+  // const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -151,10 +164,29 @@ function ChatPage() {
 
   }
 
-  const handleLogout=async (e:any)=>{
+  const handleLogout = async (e: any) => {
     await logout();
 
   }
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachedFiles(prev => [...prev, ...files]);
+
+  }
+
+  useEffect(() => {
+    // console.log(attachedFiles);
+    attachedFiles.forEach(file => {
+      console.log(file.name, file.type, file.size);
+
+    })
+
+  }, [attachedFiles])
+
 
   // ── Sidebar open/close animation ──────────────────────────────────────────
   const prevSidebar = useRef(sidebarOpen);
@@ -221,39 +253,35 @@ function ChatPage() {
     { scope: containerRef, dependencies: [messages.length === 0] }
   );
 
-  // ── Send message ──────────────────────────────────────────────────────────
-  const send = useCallback(() => {
+  //* ── Send message ──────────────────────────────────────────────────────────
+  const send = useCallback(async () => {
     const text = input.trim();
+
     if (!text) return;
-    const uid = crypto.randomUUID();
-    setMessages((m) => [...m, { id: uid, role: "user", content: text }]);
+
+    await create_message({ query: text, conversation_id: current_conversation, role: 'user' });
+
     setInput("");
     setIsTyping(true);
 
-    // Simulate agent latency 1.2–2s\
+    const formData = new FormData();
+    formData.append("query", text)
 
-    // * here we call and get response from the agent 
-    setTimeout(
-      () => {
-        setIsTyping(false);
-        setMessages((m) => [
-          ...m,
-          {
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content:
-              "Here's a grounded answer based on your knowledge base and live web sources. I cross-referenced 4 internal documents and 2 web results to produce this synthesis.",
-          },
-        ]);
-      },
-      1200 + Math.random() * 800
-    );
+    attachedFiles.forEach((file) => {
+      formData.append("files", file);
+    })
+
+    await generate_response(formData, current_conversation);
+    setIsTyping(false)
+    setAttachedFiles([]);
+
   }, [input]);
 
-  // ── Copy handler ──────────────────────────────────────────────────────────
+  //* ── Copy handler ──────────────────────────────────────────────────────────
   const handleCopy = useCallback((id: string) => {
-    setMessages((m) => m.map((msg) => msg.id === id ? { ...msg, copied: true } : msg));
-    setTimeout(() => setMessages((m) => m.map((msg) => msg.id === id ? { ...msg, copied: false } : msg)), 1800);
+    // setMessages((m) => m.map((msg) => msg.id === id ? { ...msg, copied: true } : msg));
+    // setTimeout(() => setMessages((m) => m.map((msg) => msg.id === id ? { ...msg, copied: false } : msg)), 1800);
+
   }, []);
 
   return (
@@ -349,7 +377,7 @@ function ChatPage() {
               </button>
               <div>
                 {/* // * showing the title of Chat */}
-                <div className="text-sm font-semibold">Q3 revenue analysis</div>
+                <div className="text-sm font-semibold">{conversation?.title}</div>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -410,7 +438,8 @@ function ChatPage() {
               <div className="mx-auto max-w-3xl px-4 py-8">
                 <ul className="space-y-6">
                   {messages.map((m) => (
-                    <MessageBubble key={m.id} msg={m} onCopy={handleCopy} />
+                    // type Msg = { id: string; role: "user" | "assistant"; content: string; copied?: boolean };
+                    <MessageBubble key={m.message_id} msg={m} onCopy={handleCopy} />
                   ))}
                   {isTyping && <TypingIndicator />}
                 </ul>
@@ -419,15 +448,52 @@ function ChatPage() {
           </div>
 
           {/* Input bar */}
+          {/* Preview attached files */}
+
           <div className="border-t border-border bg-background p-4 shrink-0">
+            {attachedFiles.length > 0 && (
+              <div className="flex flex-wrap gap-2 px-3 py-2">
+                {attachedFiles.map((file, index) => (
+                  <div key={index} className="flex items-center gap-1 bg-accent rounded-md px-2 py-1 text-xs">
+
+                    {/* Icon based on file type */}
+                    {file.type.startsWith("image/") && <ImageIcon className="h-3 w-3" />}
+                    {file.type.startsWith("audio/") && <Music className="h-3 w-3" />}
+                    {file.type === "application/pdf" && <FileText className="h-3 w-3" />}
+
+                    <span className="max-w-25 truncate">{file.name}</span>
+
+                    {/* Remove button */}
+                    <button
+                      onClick={() => setAttachedFiles(prev => prev.filter((_, i) => i !== index))}
+                      className="ml-1 hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="mx-auto max-w-3xl">
               <div className="flex items-end gap-2 rounded-2xl border border-border bg-card p-2 shadow-(--shadow-elegant) focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/20 transition-shadow">
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  multiple
+                  accept="image/*,audio/*,application/pdf"
+                  onChange={handleFileChange}
+                />
+
                 <button
+                  onClick={() => fileInputRef.current?.click()}
                   className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                   aria-label="Attach file"
                 >
                   <Paperclip className="h-4 w-4" />
                 </button>
+
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -463,59 +529,100 @@ function ChatPage() {
           className="flex flex-col border-l border-border bg-surface overflow-hidden shrink-0"
           style={{ width: contextOpen ? 320 : 0 }}
         >
-          <div className="border-b border-border px-4 py-3 shrink-0 min-w-77.5">
-            <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-              Context & Activity
-            </div>
-          </div>
-
-          {/* //* here showing the agent state what it use and sources cites */}
           <div className="flex-1 overflow-y-auto p-4 min-w-77.5">
-            {/* Active Sources */}
+
+            {/* Active Sources — derived from agent_state */}
             <div className="mb-5">
               <div className="mb-2 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 <Link2 className="h-3.5 w-3.5" /> Active Sources
               </div>
               <div className="space-y-2">
-                {[
-                  { icon: Database, label: "production_db", sub: "PostgreSQL v14" },
-                  { icon: FileText, label: "Onboarding.pdf", sub: "14 pages · indexed" },
-                  { icon: Globe, label: "Web Search", sub: "2 results cited" },
-                ].map((src) => (
-                  <div key={src.label} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+
+                {/* Web Search — show only if used */}
+                {agentState?.need_web_search && (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-primary shrink-0">
-                      <src.icon className="h-4 w-4" />
+                      <Globe className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium">{src.label}</div>
-                      <div className="truncate text-xs text-muted-foreground">{src.sub}</div>
+                      <div className="truncate text-sm font-medium">Web Search</div>
+                      <div className="truncate text-xs text-muted-foreground">{agentState.web_context || "No results"}</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* RAG / Knowledge Base — show if used */}
+                {agentState?.plan?.need_rag && (
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-primary shrink-0">
+                      <Database className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium">Knowledge Base</div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        {agentState.retrieved_context || "No context retrieved"}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Available Knowledge files */}
+                {agentState?.available_knowledge?.map((item: string, i: number) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-primary shrink-0">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium">{item}</div>
                     </div>
                   </div>
                 ))}
+
+                {/* Fallback if nothing was used */}
+                {!agentState?.need_web_search && !agentState?.plan?.need_rag && agentState?.available_knowledge?.length === 0 && (
+                  <div className="text-xs text-muted-foreground">No external sources used</div>
+                )}
               </div>
             </div>
-            {/* //* agent trace */}
-            {/* Agent trace */}
+
+            {/* Agent Trace — from plan + steps */}
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 <Activity className="h-3.5 w-3.5" /> Agent Trace
               </div>
               <ol className="relative space-y-3 border-l border-border pl-4">
-                {[
-                  { t: "10:42:15 AM", label: "Parsed user intent", note: "Scope detected: SQL + Python" },
-                  { t: "10:42:16 AM", label: "Queried schema info", note: "SELECT table_name FROM …" },
-                  { t: "10:42:18 AM", label: "Generated Python script", note: "psycopg2 connector" },
-                ].map((s, i) => (
+
+                {/* Intent */}
+                <li className="relative">
+                  <span className="absolute -left-5.25 top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-surface bg-primary" />
+                  <div className="text-[11px] font-mono text-muted-foreground">Step 0</div>
+                  <div className="text-sm font-medium">Parsed Intent</div>
+                  <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {agentState?.plan?.intent ?? "—"}
+                  </div>
+                </li>
+
+                {/* Plan steps */}
+                {agentState?.plan?.steps?.map((step: any, i: number) => (
                   <li key={i} className="relative">
-                    <span
-                      className={`absolute -left-5.25 top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-surface ${i === 2 ? "bg-emerald-500" : "bg-primary"
-                        }`}
-                    />
-                    <div className="text-[11px] font-mono text-muted-foreground">{s.t}</div>
-                    <div className="text-sm font-medium">{s.label}</div>
-                    <div className="mt-0.5 truncate text-xs text-muted-foreground">{s.note}</div>
+                    <span className={`absolute -left-5.25 top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-surface ${i === (agentState.plan.steps.length - 1) ? "bg-emerald-500" : "bg-primary"
+                      }`} />
+                    <div className="text-[11px] font-mono text-muted-foreground">Step {i + 1}</div>
+                    <div className="text-sm font-medium">{step.name ?? step.action ?? `Step ${i + 1}`}</div>
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">{step.description ?? "—"}</div>
                   </li>
                 ))}
+
+                {/* Final answer confirmation */}
+                <li className="relative">
+                  <span className="absolute -left-5.25 top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-surface bg-emerald-500" />
+                  <div className="text-[11px] font-mono text-muted-foreground">Final</div>
+                  <div className="text-sm font-medium">Response Generated</div>
+                  <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {agentState?.final_answer.slice(0, 60)}...
+                  </div>
+                </li>
+
               </ol>
             </div>
           </div>
