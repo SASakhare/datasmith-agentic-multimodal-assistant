@@ -25,7 +25,7 @@ export type Message = {
 export type ConversationShow = {
     conversation_id: string,
     title: string,
-    timeStamp: string,
+    created_at: string,
 }
 export type Conversation = {
     conversation_id: string,
@@ -160,53 +160,64 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
     }
     ,
     generate_response: async (input: FormData, current_conversation: string) => {
-
-
-        // * code for sending to agent:
-
-
         try {
-
             const response = await axios.post(`${API_END_POINT_CHAT}/${current_conversation}`, input, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 }
             })
 
-
             if (response.data.success) {
                 toast.success(response.data.message)
-
                 console.log(response.data);
+
+                const planTitle = response.data.agent_state?.plan?.title
 
                 set((state) => ({
                     messages: [...state.messages, response.data.response_message],
                     agentState: response.data.agent_state,
+
+                    // update title in sidebar list if plan returned one
+                    all_conversations: planTitle
+                        ? state.all_conversations.map((conv) =>
+                            conv.conversation_id === current_conversation
+                                ? { ...conv, title: planTitle }
+                                : conv
+                        )
+                        : state.all_conversations,
                 }));
+
+                // also persist to backend if title was generated
+                if (planTitle) {
+                    await axios.put(`${API_END_POINT}/update/${current_conversation}`,
+                        { title: planTitle },
+                        { headers: { "Content-Type": "application/json" } }
+                    )
+                }
             }
 
         } catch (error: any) {
             console.log(error);
             toast.error(error.response.data['detail']['message'])
-
             return;
         }
-
     },
 
     get_conversation: async (conversation_id: string) => {
         try {
 
             const response = await axios.get(`${API_END_POINT}/${conversation_id}`);
+            console.log(response);
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                console.log(response.data.message);
+                console.log(response.data.Messages);
 
                 set({
                     conversation: response.data.conversation,
-                    messages: response.data.messages,
+                    messages: response.data.Messages,
                     current_conversation: response.data.conversation["conversation_id"],
+                    agentState: null,
                 })
 
             }
@@ -229,17 +240,21 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
             if (response.data.success) {
                 toast.success(response.data.message);
+                console.log(response.data);
+
 
                 set({
                     all_conversations: response.data.conversations,
-
+                    
                 });
             }
 
 
         } catch (error: any) {
             console.log(error);
-            toast.error(error.response.data.message)
+            toast.error(error.response.data['detail']['message'])
+
+            return;
         }
 
 
@@ -256,11 +271,20 @@ export const ConversationStore = create<ConversationState>()(persist((set) => ({
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                set({
+                set((state) => ({
                     conversation: response.data.conversation,
                     current_conversation: response.data.conversation["conversation_id"],
-
-                });
+                    agentState: null,
+                    messages: [],
+                    all_conversations: [
+                        {
+                            title: response.data.conversation.title,
+                            created_at: response.data.conversation.created_at,
+                            conversation_id: response.data.conversation.conversation_id,
+                        },
+                        ...state.all_conversations,
+                    ]
+                }));
             }
 
         } catch (error: any) {
