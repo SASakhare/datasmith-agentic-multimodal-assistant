@@ -5,8 +5,8 @@ import { toast } from "sonner"
 
 
 
-const API_END_POINT = "http://127.0.0.1:8000/conversation"
-const API_END_POINT_CHAT = "http://127.0.0.1:8000/chat"
+const API_END_POINT = "https://datasmith-agentic-multimodal-assistant.onrender.com/conversation"
+const API_END_POINT_CHAT = "https://datasmith-agentic-multimodal-assistant.onrender.com/chat"
 
 axios.defaults.withCredentials = true
 
