@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware"
 import axios from "axios"
 import { ConversationStore } from "./useChatStore"
 
-const API_END_POINT = "https://datasmith-agentic-multimodal-assistant.onrender.com/auth"
+const API_END_POINT = "http://127.0.0.1:8000/auth"
 axios.defaults.withCredentials = true
 
 
@@ -167,7 +167,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
         } catch (error: any) {
             toast.error(error.response.data.message);
             // console.log(error);
-
+            
             set({
                 loading: false,
                 isCheckingAuth: false,
